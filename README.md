@@ -8,6 +8,8 @@ Future state?  `In` can be used to get the security posture of a given applicati
 
 * `defectdojo_url`: *Required.* The path of the hosted instance of defectdojo.
 
+* `debug`: *Optional.* Enable debug logging.
+
 ### Example
 
 ``` yaml

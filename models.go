@@ -7,6 +7,7 @@ import (
 
 type Source struct {
 	DefectDojoUrl string `json:"defectdojo_url"`
+	Debug         bool   `json:"debug"`
 }
 
 func (s *Source) Validate() error {
