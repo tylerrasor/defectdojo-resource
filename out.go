@@ -54,8 +54,12 @@ type PutRequest struct {
 	Params PutParams `json:"params"`
 }
 
+type PutResponse struct {
+	Version Version `json:"version"`
+}
+
 func (o *Out) Execute() error {
-	logrus.SetOutput(o.stdout)
+	logrus.SetOutput(o.stderr)
 	var request PutRequest
 
 	decoder := json.NewDecoder(o.stdin)
@@ -80,5 +84,20 @@ func (o *Out) Execute() error {
 		return fmt.Errorf("invalid params config: %s", err)
 	}
 
+	// dump the response to stdout for concourse
+	if err := buildResponse(o); err != nil {
+		return fmt.Errorf("error encoding response to JSON: %s", err)
+	}
+
 	return nil
+}
+
+func buildResponse(o *Out) error {
+	version := "need to figure out unique combination of app name, version, build number, something"
+	logrus.Debugln("preparing to JSON encode response: %s", version)
+	return json.NewEncoder(o.stdout).Encode(PutResponse{
+		Version{
+			Version: version,
+		},
+	})
 }

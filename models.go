@@ -19,3 +19,7 @@ func (s *Source) Validate() error {
 	}
 	return nil
 }
+
+type Version struct {
+	Version string `json:"version"`
+}
