@@ -18,10 +18,9 @@ func main() {
 		os.Args,
 	)
 
-	err := command.Execute()
-	if err != nil {
+	if err := command.Execute(); err != nil {
+		logrus.SetOutput(os.Stderr)
 		logrus.Errorf("%s", err)
 		os.Exit(1)
 	}
-	os.Exit(0)
 }

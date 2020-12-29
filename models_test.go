@@ -7,21 +7,35 @@ import (
 	resource "github.com/tylerrasor/defectdojo-resource"
 )
 
-func TestValidate(t *testing.T) {
+func TestSourceValidate(t *testing.T) {
 	source := resource.Source{
 		DefectDojoUrl: "",
 	}
 	err := source.Validate()
 	assert.NotNil(t, err)
-	assert.Equal(t, "Required parameter `DefectDojoUrl` not supplied.", err.Error())
+	assert.EqualError(t, err, "Required parameter `defectdojo_url` not supplied.")
 }
 
-func TestValidateChecksForHttp(t *testing.T) {
+func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 	source := resource.Source{
 		DefectDojoUrl: "url-without-http.com",
 	}
 
 	err := source.Validate()
 	assert.NotNil(t, err)
-	assert.Equal(t, "Please provide http(s):// prefix", err.Error())
+	assert.EqualError(t, err, "Please provide http(s):// prefix")
+
+	source = resource.Source{
+		DefectDojoUrl: "http://url-that-should-work.com",
+	}
+
+	err = source.Validate()
+	assert.Nil(t, err)
+
+	source = resource.Source{
+		DefectDojoUrl: "https://url-that-should-work.com",
+	}
+
+	err = source.Validate()
+	assert.Nil(t, err)
 }

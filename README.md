@@ -26,3 +26,13 @@ resources:
   source:
     defectdojo_url: https://path-to-your-hosted-instance.io
 ```
+
+## Behavior
+
+### `out`
+
+Pushes a report of a given type to Defectdojo for the specified application.
+
+#### Parameters
+
+* `report_type`: *Required.* The type of report you're trying to upload.  Currently supported types

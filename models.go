@@ -12,9 +12,9 @@ type Source struct {
 
 func (s *Source) Validate() error {
 	if s.DefectDojoUrl == "" {
-		return errors.New("Required parameter `DefectDojoUrl` not supplied.")
+		return errors.New("Required parameter `defectdojo_url` not supplied.")
 	}
-	if !strings.HasPrefix(s.DefectDojoUrl, "http://") || !strings.HasPrefix(s.DefectDojoUrl, "https://") {
+	if !strings.HasPrefix(s.DefectDojoUrl, "http://") && !strings.HasPrefix(s.DefectDojoUrl, "https://") {
 		return errors.New("Please provide http(s):// prefix")
 	}
 	return nil
