@@ -14,6 +14,9 @@ func TestNewClientFailsWithBunkCreds(t *testing.T) {
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusBadRequest)
 		}
+		if r.Header.Get("Authorization") == "Token bad_key" {
+			w.WriteHeader(http.StatusUnauthorized)
+		}
 	}))
 	defer mock_server.Close()
 

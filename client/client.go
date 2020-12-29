@@ -57,14 +57,17 @@ func (c *DefectdojoClient) tryToAuth() error {
 	token_str := fmt.Sprintf("Token %s", c.api_key)
 	req.Header.Add("Authorization", token_str)
 
+	logrus.Debugln("grabbing list of products just to confirm we can auth")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("recieved some kind of error: %s", err)
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("received status code of `%d`", resp.StatusCode)
 	}
+
 	return nil
 }
 
