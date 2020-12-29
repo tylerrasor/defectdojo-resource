@@ -3,7 +3,7 @@ WORKDIR /resource
 COPY . /resource
 
 ENV CGO_ENABLED 0
-RUN go test -failfast
+RUN go test ./models . -failfast
 RUN mkdir /resource/bin
 # RUN go build -o /resource/bin/check ./cmd/check
 # RUN go build -o /resource/bin/in ./cmd/in

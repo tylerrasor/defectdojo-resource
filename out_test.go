@@ -1,50 +1,78 @@
 package resource_test
 
 import (
-	"fmt"
+	"bytes"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	resource "github.com/tylerrasor/defectdojo-resource"
 )
 
-func TestPutParamsValidate(t *testing.T) {
-	params := resource.PutParams{
-		ReportType: "ZAP Scan",
-	}
+func TestDecodeFromOutSucceeds(t *testing.T) {
+	var mock_stdin bytes.Buffer
 
-	err := params.Validate()
+	mock_stdin.Write([]byte(`
+	{
+		"source": {},
+		"params": {},
+		"unexpectedkey": {}
+	}`))
+
+	out := resource.NewOut(
+		&mock_stdin,
+		os.Stderr,
+		os.Stdout,
+		nil,
+	)
+
+	req, err := resource.DecodeFromOut(out)
+
+	assert.NotNil(t, err)
+	assert.Nil(t, req)
+}
+
+func TestDecodeFromOutSetsErrorMessage(t *testing.T) {
+	var mock_stdin bytes.Buffer
+
+	mock_stdin.Write([]byte(`
+	{
+		"source": {
+			"defectdojo_url": "something"
+		},
+		"params": {
+			"report_type": "something"
+		}
+	}`))
+
+	out := resource.NewOut(
+		&mock_stdin,
+		os.Stderr,
+		os.Stdout,
+		nil,
+	)
+
+	req, err := resource.DecodeFromOut(out)
+
 	assert.Nil(t, err)
+	assert.NotNil(t, req)
 }
 
-func TestPutParamsValidateNoReportType(t *testing.T) {
-	params := resource.PutParams{}
+// not sure how much value this actually provides, but at least we know we have
+// a test around the expected output string to report back to concourse
+func TestBuildRespone(t *testing.T) {
+	var mock_stdout bytes.Buffer
 
-	err := params.Validate()
-	assert.NotNil(t, err)
-	assert.EqualError(t, err, "Required parameter `report_type` not supplied.")
-}
+	out := resource.NewOut(
+		os.Stdin,
+		os.Stderr,
+		&mock_stdout,
+		nil,
+	)
 
-func TestPutParamsValidateInvalidType(t *testing.T) {
-	report_type := "invalid"
-	params := resource.PutParams{
-		ReportType: report_type,
-	}
+	err := resource.BuildResponse(out)
 
-	err := params.Validate()
-	assert.NotNil(t, err)
-	expected := fmt.Sprintf("The specified report type, `%s`, is not a supported by Defectdojo (check that your format matches expected)", report_type)
-	assert.EqualError(t, err, expected)
-}
-
-func TestPutParamsValidateNotYetImplemented(t *testing.T) {
-	report_type := "Burp Scan"
-	params := resource.PutParams{
-		ReportType: report_type,
-	}
-
-	err := params.Validate()
-	assert.NotNil(t, err)
-	expected := fmt.Sprintf("The specified report type, `%s`, hasn't been implemented yet (pull requests welcome!)", report_type)
-	assert.EqualError(t, err, expected)
+	assert.Nil(t, err)
+	expected := "{\"version\":{\"version\":\"need to figure out unique combination of app name, version, build number, something\"}}\n"
+	assert.Equal(t, expected, mock_stdout.String())
 }

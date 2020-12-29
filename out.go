@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/sirupsen/logrus"
+	models "github.com/tylerrasor/defectdojo-resource/models"
 )
 
 type Out struct {
@@ -29,43 +30,11 @@ func NewOut(
 	}
 }
 
-type PutParams struct {
-	ReportType string `json:"report_type"`
-}
-
-func (p *PutParams) Validate() error {
-	if p.ReportType == "" {
-		return fmt.Errorf("Required parameter `report_type` not supplied.")
-	}
-
-	implemented, key_exists := SupportedReportTypes[p.ReportType]
-	if !key_exists {
-		return fmt.Errorf("The specified report type, `%s`, is not a supported by Defectdojo (check that your format matches expected)", p.ReportType)
-	}
-	if !implemented {
-		return fmt.Errorf("The specified report type, `%s`, hasn't been implemented yet (pull requests welcome!)", p.ReportType)
-	}
-
-	return nil
-}
-
-type PutRequest struct {
-	Source Source    `json:"source"`
-	Params PutParams `json:"params"`
-}
-
-type PutResponse struct {
-	Version Version `json:"version"`
-}
-
 func (o *Out) Execute() error {
 	logrus.SetOutput(o.stderr)
-	var request PutRequest
 
-	decoder := json.NewDecoder(o.stdin)
-	decoder.DisallowUnknownFields()
-
-	if err := decoder.Decode(&request); err != nil {
+	request, err := DecodeFromOut(o)
+	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
 
@@ -78,26 +47,53 @@ func (o *Out) Execute() error {
 	if err := request.Source.Validate(); err != nil {
 		return fmt.Errorf("invalid source config: %s", err)
 	}
-	logrus.Debugln("source must have validated correctly")
 
+	logrus.Debugln("getting ready to validate params")
 	if err := request.Params.Validate(); err != nil {
 		return fmt.Errorf("invalid params config: %s", err)
 	}
 
+	// engagement_id, err := getOrCreateEngagement(request)
+	// if err != nil {
+	// 	return fmt.Errorf("error getting or creating engagement: %s", err)
+	// }
+	// logrus.Debugln(engagement_id)
+
 	// dump the response to stdout for concourse
-	if err := buildResponse(o); err != nil {
+	if err := BuildResponse(o); err != nil {
 		return fmt.Errorf("error encoding response to JSON: %s", err)
 	}
 
 	return nil
 }
 
-func buildResponse(o *Out) error {
-	version := "need to figure out unique combination of app name, version, build number, something"
-	logrus.Debugln("preparing to JSON encode response: %s", version)
-	return json.NewEncoder(o.stdout).Encode(PutResponse{
-		Version{
-			Version: version,
-		},
-	})
+func DecodeFromOut(o *Out) (*models.PutRequest, error) {
+	var request models.PutRequest
+
+	decoder := json.NewDecoder(o.stdin)
+	decoder.DisallowUnknownFields()
+
+	if err := decoder.Decode(&request); err != nil {
+		return nil, err
+	}
+	return &request, nil
+}
+
+// func getOrCreateEngagement(req *PutRequest) (int, error) {
+// 	return 1, nil
+// }
+
+func BuildResponse(o *Out) error {
+	version_str := "need to figure out unique combination of app name, version, build number, something"
+	message := fmt.Sprintf("preparing to JSON encode response: %s", version_str)
+	logrus.Debugln(message)
+
+	version := models.Version{
+		Version: version_str,
+	}
+	response := models.PutResponse{
+		Version: version,
+	}
+
+	return json.NewEncoder(o.stdout).Encode(response)
 }
