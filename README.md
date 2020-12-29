@@ -35,4 +35,4 @@ Pushes a report of a given type to Defectdojo for the specified application.
 
 #### Parameters
 
-* `report_type`: *Required.* The type of report you're trying to upload.  Currently supported types
+* `report_type`: *Required.* The type of report you're trying to upload.  The format of this string must match the internal scan type strings that defectdojo is using, [found here](https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py).
