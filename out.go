@@ -6,7 +6,8 @@ import (
 	"io"
 
 	"github.com/sirupsen/logrus"
-	models "github.com/tylerrasor/defectdojo-resource/models"
+	"github.com/tylerrasor/defectdojo-resource/client"
+	"github.com/tylerrasor/defectdojo-resource/models"
 )
 
 type Out struct {
@@ -53,14 +54,20 @@ func (o *Out) Execute() error {
 		return fmt.Errorf("invalid params config: %s", err)
 	}
 
-	// engagement_id, err := getOrCreateEngagement(request)
-	// if err != nil {
-	// 	return fmt.Errorf("error getting or creating engagement: %s", err)
-	// }
-	// logrus.Debugln(engagement_id)
+	logrus.Debugln("creating http client")
+	client, err := client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.Username, request.Source.Password, request.Source.ApiKey)
+	if err != nil {
+		return fmt.Errorf("error creating client to interact with defectdojo: %s", err)
+	}
+
+	engagement_id, err := client.GetOrCreateEngagement()
+	if err != nil {
+		return fmt.Errorf("error getting or creating engagement: %s", err)
+	}
+	logrus.Debugln(engagement_id)
 
 	// dump the response to stdout for concourse
-	if err := BuildResponse(o); err != nil {
+	if err := OutputVersionToConcourse(o); err != nil {
 		return fmt.Errorf("error encoding response to JSON: %s", err)
 	}
 
@@ -79,11 +86,7 @@ func DecodeFromOut(o *Out) (*models.PutRequest, error) {
 	return &request, nil
 }
 
-// func getOrCreateEngagement(req *PutRequest) (int, error) {
-// 	return 1, nil
-// }
-
-func BuildResponse(o *Out) error {
+func OutputVersionToConcourse(o *Out) error {
 	version_str := "need to figure out unique combination of app name, version, build number, something"
 	message := fmt.Sprintf("preparing to JSON encode response: %s", version_str)
 	logrus.Debugln(message)

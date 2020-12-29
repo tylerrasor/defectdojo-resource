@@ -8,6 +8,7 @@ import (
 type Source struct {
 	DefectDojoUrl string `json:"defectdojo_url"`
 	Username      string `json:"username"`
+	Password      string `json:"password,omitempty"`
 	ApiKey        string `json:"api_key"`
 	Debug         bool   `json:"debug"`
 }

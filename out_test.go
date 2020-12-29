@@ -70,7 +70,7 @@ func TestBuildRespone(t *testing.T) {
 		nil,
 	)
 
-	err := resource.BuildResponse(out)
+	err := resource.OutputVersionToConcourse(out)
 
 	assert.Nil(t, err)
 	expected := "{\"version\":{\"version\":\"need to figure out unique combination of app name, version, build number, something\"}}\n"
