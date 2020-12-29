@@ -8,6 +8,10 @@ Future state?  `In` can be used to get the security posture of a given applicati
 
 * `defectdojo_url`: *Required.* The path of the hosted instance of defectdojo.
 
+* `username`: *Required.* The username to authenticate to defectdojo with.
+
+* `api_key`: *Required.* Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html).
+
 * `debug`: *Optional.* Enable debug logging.
 
 ### Example
@@ -25,6 +29,7 @@ resources:
   type: defectdojo-resource
   source:
     defectdojo_url: https://path-to-your-hosted-instance.io
+    api_key: ((from-a-secret-manager-probably))
 ```
 
 ## Behavior
