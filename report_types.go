@@ -18,7 +18,7 @@ var SupportedReportTypes = map[string]bool{
 	"Crashtest Security XML File":  false,
 	"Bandit Scan":                  false,
 	"ESLint Scan":                  false,
-	"ZAP Scan":                     false,
+	"ZAP Scan":                     true,
 	"AppSpider Scan":               false,
 	"Arachni Scan":                 false,
 	"VCG Scan":                     false,
