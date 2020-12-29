@@ -40,7 +40,7 @@ func (p *PutParams) Validate() error {
 
 	implemented, key_exists := SupportedReportTypes[p.ReportType]
 	if !key_exists {
-		return fmt.Errorf("The specified report type, `%s`, is not a supported by Defectdojo", p.ReportType)
+		return fmt.Errorf("The specified report type, `%s`, is not a supported by Defectdojo (check that your format matches expected)", p.ReportType)
 	}
 	if !implemented {
 		return fmt.Errorf("The specified report type, `%s`, hasn't been implemented yet (pull requests welcome!)", p.ReportType)

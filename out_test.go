@@ -10,7 +10,7 @@ import (
 
 func TestPutParamsValidate(t *testing.T) {
 	params := resource.PutParams{
-		ReportType: "zap",
+		ReportType: "ZAP Scan",
 	}
 
 	err := params.Validate()
@@ -33,12 +33,12 @@ func TestPutParamsValidateInvalidType(t *testing.T) {
 
 	err := params.Validate()
 	assert.NotNil(t, err)
-	expected := fmt.Sprintf("The specified report type, `%s`, is not a supported by Defectdojo", report_type)
+	expected := fmt.Sprintf("The specified report type, `%s`, is not a supported by Defectdojo (check that your format matches expected)", report_type)
 	assert.EqualError(t, err, expected)
 }
 
 func TestPutParamsValidateNotYetImplemented(t *testing.T) {
-	report_type := "arachni"
+	report_type := "Burp Scan"
 	params := resource.PutParams{
 		ReportType: report_type,
 	}
