@@ -1,0 +1,25 @@
+name: pull-request-test
+
+on: [pull_request]
+
+jobs:
+  pull-request-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: install buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      - name: docker login
+        uses: docker/login-action@v1
+        with:
+          username: tylerrasor
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: build the image
+        run: |
+          docker buildx build \
+            --tag tylerrasor/defectdojo-resource:latest \
+            --platform linux/arm64,linux/amd64 .
