@@ -63,11 +63,3 @@ func (s *Source) ValidateSource() error {
 	}
 	return nil
 }
-
-type Request interface {
-	Validate() error
-}
-
-type Params interface {
-	ValidateParams() error
-}
