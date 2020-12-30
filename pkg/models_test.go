@@ -13,7 +13,7 @@ func TestSourceValidate(t *testing.T) {
 		Username:      "something",
 		ApiKey:        "something",
 	}
-	err := source.Validate()
+	err := source.ValidateSource()
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Required `defectdojo_url` not supplied.")
 }
@@ -25,7 +25,7 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 		ApiKey:        "something",
 	}
 
-	err := source.Validate()
+	err := source.ValidateSource()
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Please provide http(s):// prefix in `defectdojo_url`.")
 
@@ -35,7 +35,7 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 		ApiKey:        "something",
 	}
 
-	err = source.Validate()
+	err = source.ValidateSource()
 	assert.Nil(t, err)
 
 	source = resource.Source{
@@ -44,7 +44,7 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 		ApiKey:        "something",
 	}
 
-	err = source.Validate()
+	err = source.ValidateSource()
 	assert.Nil(t, err)
 }
 
@@ -54,7 +54,7 @@ func TestSourceValidateUsernameMissing(t *testing.T) {
 		ApiKey:        "something",
 	}
 
-	err := source.Validate()
+	err := source.ValidateSource()
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Required `username` not supplied.")
 }
@@ -65,7 +65,7 @@ func TestSourceValidateApiKeyMissing(t *testing.T) {
 		Username:      "something",
 	}
 
-	err := source.Validate()
+	err := source.ValidateSource()
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "Required `api_key` not supplied.")
 }

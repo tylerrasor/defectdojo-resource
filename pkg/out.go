@@ -8,10 +8,10 @@ import (
 	"github.com/tylerrasor/defectdojo-resource/client"
 )
 
-func (o *Concourse) Put() error {
-	logrus.SetOutput(o.stderr)
+func (c *Concourse) Put() error {
+	logrus.SetOutput(c.stderr)
 
-	request, err := DecodeFromOut(o)
+	request, err := DecodeToPutRequest(c)
 	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
@@ -19,16 +19,6 @@ func (o *Concourse) Put() error {
 	if request.Source.Debug {
 		logrus.SetLevel(logrus.DebugLevel)
 		logrus.Debugln("debug logging on")
-	}
-
-	logrus.Debugln("getting ready to validate source")
-	if err := request.Source.Validate(); err != nil {
-		return fmt.Errorf("invalid source config: %s", err)
-	}
-
-	logrus.Debugln("getting ready to validate params")
-	if err := request.Params.Validate(); err != nil {
-		return fmt.Errorf("invalid params config: %s", err)
 	}
 
 	logrus.Debugln("creating http client")
@@ -44,21 +34,20 @@ func (o *Concourse) Put() error {
 	logrus.Debugln(engagement_id)
 
 	// dump the response to stdout for concourse
-	if err := OutputVersionToConcourse(o); err != nil {
+	if err := OutputVersionToConcourse(c); err != nil {
 		return fmt.Errorf("error encoding response to JSON: %s", err)
 	}
 
 	return nil
 }
 
-func DecodeFromOut(o *Concourse) (*PutRequest, error) {
-	var request PutRequest
-
-	decoder := json.NewDecoder(o.stdin)
+func DecodeToPutRequest(c *Concourse) (*PutRequest, error) {
+	decoder := json.NewDecoder(c.stdin)
 	decoder.DisallowUnknownFields()
 
-	if err := decoder.Decode(&request); err != nil {
+	var req PutRequest
+	if err := decoder.Decode(&req); err != nil {
 		return nil, err
 	}
-	return &request, nil
+	return &req, nil
 }

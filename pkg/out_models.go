@@ -1,13 +1,35 @@
 package resource
 
-import "fmt"
+import (
+	"fmt"
 
-/* specific to PUT */
+	"github.com/sirupsen/logrus"
+)
+
+type PutRequest struct {
+	Source Source    `json:"source"`
+	Params PutParams `json:"params"`
+}
+
+func (r PutRequest) Validate() error {
+	logrus.Debugln("getting ready to validate source")
+	if err := r.Source.ValidateSource(); err != nil {
+		return fmt.Errorf("invalid source config: %s", err)
+	}
+
+	logrus.Debugln("getting ready to validate params")
+	if err := r.Params.ValidateParams(); err != nil {
+		return fmt.Errorf("invalid params config: %s", err)
+	}
+
+	return nil
+}
+
 type PutParams struct {
 	ReportType string `json:"report_type"`
 }
 
-func (p *PutParams) Validate() error {
+func (p PutParams) ValidateParams() error {
 	if p.ReportType == "" {
 		return fmt.Errorf("Required parameter `report_type` not supplied.")
 	}
@@ -21,9 +43,4 @@ func (p *PutParams) Validate() error {
 	}
 
 	return nil
-}
-
-type PutRequest struct {
-	Source Source    `json:"source"`
-	Params PutParams `json:"params"`
 }
