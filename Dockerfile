@@ -3,7 +3,9 @@ WORKDIR /resource
 COPY . /resource
 
 ENV CGO_ENABLED 0
+RUN test -z $(gofmt -l ./client ./pkg)
 RUN go test ./client ./pkg  -failfast
+
 RUN mkdir /resource/bin
 # RUN go build -o /resource/bin/check ./cmd/check
 RUN go build -o /resource/bin/in ./cmd/in
