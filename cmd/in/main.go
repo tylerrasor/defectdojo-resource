@@ -18,7 +18,7 @@ func main() {
 		os.Args,
 	)
 
-	if err := command.Put(); err != nil {
+	if err := command.Get(); err != nil {
 		logrus.SetOutput(os.Stderr)
 		logrus.Errorf("%s", err)
 		os.Exit(1)

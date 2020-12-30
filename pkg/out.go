@@ -3,35 +3,12 @@ package resource
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/sirupsen/logrus"
 	"github.com/tylerrasor/defectdojo-resource/client"
-	"github.com/tylerrasor/defectdojo-resource/models"
 )
 
-type Out struct {
-	stdin  io.Reader
-	stderr io.Writer
-	stdout io.Writer
-	args   []string
-}
-
-func NewOut(
-	stdin io.Reader,
-	stderr io.Writer,
-	stdout io.Writer,
-	args []string,
-) *Out {
-	return &Out{
-		stdin:  stdin,
-		stderr: stderr,
-		stdout: stdout,
-		args:   args,
-	}
-}
-
-func (o *Out) Execute() error {
+func (o *Concourse) Put() error {
 	logrus.SetOutput(o.stderr)
 
 	request, err := DecodeFromOut(o)
@@ -74,8 +51,8 @@ func (o *Out) Execute() error {
 	return nil
 }
 
-func DecodeFromOut(o *Out) (*models.PutRequest, error) {
-	var request models.PutRequest
+func DecodeFromOut(o *Concourse) (*PutRequest, error) {
+	var request PutRequest
 
 	decoder := json.NewDecoder(o.stdin)
 	decoder.DisallowUnknownFields()
@@ -84,19 +61,4 @@ func DecodeFromOut(o *Out) (*models.PutRequest, error) {
 		return nil, err
 	}
 	return &request, nil
-}
-
-func OutputVersionToConcourse(o *Out) error {
-	version_str := "need to figure out unique combination of app name, version, build number, something"
-	message := fmt.Sprintf("preparing to JSON encode response: %s", version_str)
-	logrus.Debugln(message)
-
-	version := models.Version{
-		Version: version_str,
-	}
-	response := models.PutResponse{
-		Version: version,
-	}
-
-	return json.NewEncoder(o.stdout).Encode(response)
 }

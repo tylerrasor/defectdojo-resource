@@ -3,10 +3,10 @@ WORKDIR /resource
 COPY . /resource
 
 ENV CGO_ENABLED 0
-RUN go test . ./client ./models -failfast
+RUN go test ./client ./pkg  -failfast
 RUN mkdir /resource/bin
 # RUN go build -o /resource/bin/check ./cmd/check
-# RUN go build -o /resource/bin/in ./cmd/in
+RUN go build -o /resource/bin/in ./cmd/in
 RUN go build -o /resource/bin/out ./cmd/out
 
 FROM alpine:edge AS resource

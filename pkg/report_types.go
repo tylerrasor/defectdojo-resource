@@ -1,4 +1,4 @@
-package models
+package resource
 
 // from: https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py
 
