@@ -48,7 +48,7 @@ func (c *Concourse) WriteResponseToConcourse(response Response) error {
 	return json.NewEncoder(c.stdout).Encode(response)
 }
 
-func (s *Source) Validate() error {
+func (s *Source) ValidateSource() error {
 	if s.DefectDojoUrl == "" {
 		return fmt.Errorf("Required `defectdojo_url` not supplied.")
 	}

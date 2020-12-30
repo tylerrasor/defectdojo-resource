@@ -4,7 +4,7 @@ COPY . /resource
 
 ENV CGO_ENABLED 0
 RUN test -z $(gofmt -l ./client ./pkg)
-RUN go test ./client ./pkg  -failfast
+RUN go test ./client ./pkg -failfast
 
 RUN mkdir /resource/bin
 # RUN go build -o /resource/bin/check ./cmd/check
@@ -17,4 +17,4 @@ COPY --from=builder /resource/bin /opt/resource
 RUN chmod +x /opt/resource/*
 
 # Test binaries exist
-RUN stat /opt/resource/out
+RUN stat /opt/resource/in /opt/resource/out

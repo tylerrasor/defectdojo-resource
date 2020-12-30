@@ -9,7 +9,7 @@ import (
 	resource "github.com/tylerrasor/defectdojo-resource/pkg"
 )
 
-func TestDecodeFromOutSucceeds(t *testing.T) {
+func TestDecodeToPutRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
 	var mock_stdin bytes.Buffer
 
 	mock_stdin.Write([]byte(`
@@ -19,20 +19,20 @@ func TestDecodeFromOutSucceeds(t *testing.T) {
 		"unexpectedkey": {}
 	}`))
 
-	out := resource.NewConcourse(
+	c := resource.NewConcourse(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	req, err := resource.DecodeFromOut(out)
+	get, err := resource.DecodeToPutRequest(c)
 
 	assert.NotNil(t, err)
-	assert.Nil(t, req)
+	assert.Nil(t, get)
 }
 
-func TestDecodeFromOutSetsErrorMessage(t *testing.T) {
+func TestDecodeToPutRequestWorks(t *testing.T) {
 	var mock_stdin bytes.Buffer
 
 	mock_stdin.Write([]byte(`
@@ -45,15 +45,15 @@ func TestDecodeFromOutSetsErrorMessage(t *testing.T) {
 		}
 	}`))
 
-	out := resource.NewConcourse(
+	c := resource.NewConcourse(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	req, err := resource.DecodeFromOut(out)
+	get, err := resource.DecodeToPutRequest(c)
 
 	assert.Nil(t, err)
-	assert.NotNil(t, req)
+	assert.NotNil(t, get)
 }
