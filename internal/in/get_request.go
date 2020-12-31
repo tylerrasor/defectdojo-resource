@@ -16,8 +16,8 @@ func (g GetRequest) Validate() error {
 	return fmt.Errorf("not implemented yet")
 }
 
-func DecodeToGetRequest(c *concourse.Concourse) (*GetRequest, error) {
-	decoder := json.NewDecoder(c.In)
+func DecodeToGetRequest(w *concourse.Worker) (*GetRequest, error) {
+	decoder := json.NewDecoder(w.In)
 	decoder.DisallowUnknownFields()
 
 	var req GetRequest

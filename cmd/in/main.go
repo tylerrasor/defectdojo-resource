@@ -12,14 +12,14 @@ import (
 func main() {
 	color.NoColor = false
 
-	command := concourse.NewConcourse(
+	w := concourse.AttachToWorker(
 		os.Stdin,
 		os.Stderr,
 		os.Stdout,
 		os.Args,
 	)
 
-	if err := in.Get(command); err != nil {
+	if err := in.Get(w); err != nil {
 		logrus.SetOutput(os.Stderr)
 		logrus.Errorf("%s", err)
 		os.Exit(1)

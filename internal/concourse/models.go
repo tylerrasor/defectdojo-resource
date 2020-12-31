@@ -1,32 +1,9 @@
 package concourse
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
 )
-
-func NewConcourse(
-	stdin io.Reader,
-	stderr io.Writer,
-	stdout io.Writer,
-	args []string,
-) *Concourse {
-	return &Concourse{
-		In:   stdin,
-		Err:  stderr,
-		Out:  stdout,
-		Args: args,
-	}
-}
-
-type Concourse struct {
-	In   io.Reader
-	Err  io.Writer
-	Out  io.Writer
-	Args []string
-}
 
 type Response struct {
 	Version Version `json:"version"`
@@ -42,10 +19,6 @@ type Source struct {
 	Password      string `json:"password,omitempty"`
 	ApiKey        string `json:"api_key"`
 	Debug         bool   `json:"debug"`
-}
-
-func (c *Concourse) WriteResponseToConcourse(response Response) error {
-	return json.NewEncoder(c.Out).Encode(response)
 }
 
 func (s *Source) ValidateSource() error {

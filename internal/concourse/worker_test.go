@@ -2,6 +2,7 @@ package concourse_test
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"testing"
 
@@ -11,19 +12,25 @@ import (
 
 // not sure how much value this actually provides, but at least we know we have
 // a test around the expected output string to report back to concourse
-func TestBuildRespone(t *testing.T) {
+func TestOutputVersionResponseToConcourse(t *testing.T) {
 	var mock_stdout bytes.Buffer
 
-	out := concourse.NewConcourse(
+	w := concourse.AttachToWorker(
 		os.Stdin,
 		os.Stderr,
 		&mock_stdout,
 		nil,
 	)
 
-	err := concourse.OutputVersionToConcourse(out)
+	r := concourse.Response{
+		Version: concourse.Version{
+			Version: "0.1",
+		},
+	}
+
+	err := w.OutputResponseToConcourse(r)
 
 	assert.Nil(t, err)
-	expected := "{\"version\":{\"version\":\"need to figure out unique combination of app name, version, build number, something\"}}\n"
+	expected := fmt.Sprintf("{\"version\":{\"version\":\"%s\"}}\n", r.Version.Version)
 	assert.Equal(t, expected, mock_stdout.String())
 }

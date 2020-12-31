@@ -25,8 +25,8 @@ func (r PutRequest) ValidateRequest() error {
 	return nil
 }
 
-func DecodeToPutRequest(c *concourse.Concourse) (*PutRequest, error) {
-	decoder := json.NewDecoder(c.In)
+func DecodeToPutRequest(w *concourse.Worker) (*PutRequest, error) {
+	decoder := json.NewDecoder(w.In)
 	decoder.DisallowUnknownFields()
 
 	logrus.Debugln("decoding the concourse input to put request")

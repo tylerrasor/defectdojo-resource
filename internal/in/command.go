@@ -8,10 +8,10 @@ import (
 	"github.com/tylerrasor/defectdojo-resource/pkg/defectdojo_client"
 )
 
-func Get(c *concourse.Concourse) error {
-	logrus.SetOutput(c.Err)
+func Get(w *concourse.Worker) error {
+	logrus.SetOutput(w.Err)
 
-	request, err := DecodeToGetRequest(c)
+	request, err := DecodeToGetRequest(w)
 	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
@@ -28,7 +28,13 @@ func Get(c *concourse.Concourse) error {
 	}
 	logrus.Debugln(something)
 
-	if err := concourse.OutputVersionToConcourse(c); err != nil {
+	logrus.Debugln("building response object")
+	r := concourse.Response{
+		Version: concourse.Version{
+			Version: "need to figure out unique combination of app name, version, build number, something",
+		},
+	}
+	if err := w.OutputResponseToConcourse(r); err != nil {
 		return fmt.Errorf("error encoding response to JSON: %s", err)
 	}
 

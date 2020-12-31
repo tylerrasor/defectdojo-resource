@@ -20,14 +20,14 @@ func TestDecodeToPutRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
 		"unexpectedkey": {}
 	}`))
 
-	c := concourse.NewConcourse(
+	w := concourse.AttachToWorker(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	get, err := out.DecodeToPutRequest(c)
+	get, err := out.DecodeToPutRequest(w)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, get)
@@ -48,14 +48,14 @@ func TestDecodeToPutRequestWorks(t *testing.T) {
 		}
 	}`))
 
-	c := concourse.NewConcourse(
+	w := concourse.AttachToWorker(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	get, err := out.DecodeToPutRequest(c)
+	get, err := out.DecodeToPutRequest(w)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, get)
