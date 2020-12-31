@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/pkg"
+	resource "github.com/tylerrasor/defectdojo-resource/internal"
 )
 
 func TestGetParamsValidate(t *testing.T) {

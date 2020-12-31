@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/pkg"
+	resource "github.com/tylerrasor/defectdojo-resource/internal"
 )
 
-func TestDecodeToGetRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
+func TestDecodeToPutRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
 	var mock_stdin bytes.Buffer
 
 	mock_stdin.Write([]byte(`
@@ -26,13 +26,13 @@ func TestDecodeToGetRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
 		nil,
 	)
 
-	get, err := resource.DecodeToGetRequest(c)
+	get, err := resource.DecodeToPutRequest(c)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, get)
 }
 
-func TestDecodeToGetRequestWorks(t *testing.T) {
+func TestDecodeToPutRequestWorks(t *testing.T) {
 	var mock_stdin bytes.Buffer
 
 	mock_stdin.Write([]byte(`
@@ -40,7 +40,9 @@ func TestDecodeToGetRequestWorks(t *testing.T) {
 		"source": {
 			"defectdojo_url": "something"
 		},
-		"params": {}
+		"params": {
+			"report_type": "something"
+		}
 	}`))
 
 	c := resource.NewConcourse(
@@ -50,7 +52,7 @@ func TestDecodeToGetRequestWorks(t *testing.T) {
 		nil,
 	)
 
-	get, err := resource.DecodeToGetRequest(c)
+	get, err := resource.DecodeToPutRequest(c)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, get)

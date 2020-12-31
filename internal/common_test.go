@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/pkg"
+	resource "github.com/tylerrasor/defectdojo-resource/internal"
 )
 
 // not sure how much value this actually provides, but at least we know we have

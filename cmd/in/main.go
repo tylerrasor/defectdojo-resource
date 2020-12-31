@@ -5,7 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
-	resource "github.com/tylerrasor/defectdojo-resource/pkg"
+	resource "github.com/tylerrasor/defectdojo-resource/internal"
 )
 
 func main() {
