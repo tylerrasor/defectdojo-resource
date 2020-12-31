@@ -10,7 +10,6 @@ import (
 func TestSourceValidate(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "",
-		Username:      "something",
 		ApiKey:        "something",
 	}
 	err := source.ValidateSource()
@@ -21,7 +20,6 @@ func TestSourceValidate(t *testing.T) {
 func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "url-without-http.com",
-		Username:      "something",
 		ApiKey:        "something",
 	}
 
@@ -31,7 +29,6 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 
 	source = concourse.Source{
 		DefectDojoUrl: "http://url-that-should-work.com",
-		Username:      "something",
 		ApiKey:        "something",
 	}
 
@@ -40,7 +37,6 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 
 	source = concourse.Source{
 		DefectDojoUrl: "https://url-that-should-work.com",
-		Username:      "something",
 		ApiKey:        "something",
 	}
 
@@ -48,21 +44,9 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestSourceValidateUsernameMissing(t *testing.T) {
-	source := concourse.Source{
-		DefectDojoUrl: "http://something",
-		ApiKey:        "something",
-	}
-
-	err := source.ValidateSource()
-	assert.NotNil(t, err)
-	assert.EqualError(t, err, "Required `username` not supplied.")
-}
-
 func TestSourceValidateApiKeyMissing(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "http://something",
-		Username:      "something",
 	}
 
 	err := source.ValidateSource()
