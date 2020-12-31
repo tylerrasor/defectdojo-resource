@@ -1,15 +1,15 @@
-package resource_test
+package out_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/pkg"
+	"github.com/tylerrasor/defectdojo-resource/internal/out"
 )
 
 func TestPutParamsValidate(t *testing.T) {
-	params := resource.PutParams{
+	params := out.PutParams{
 		ReportType: "ZAP Scan",
 	}
 
@@ -18,7 +18,7 @@ func TestPutParamsValidate(t *testing.T) {
 }
 
 func TestPutParamsValidateNoReportType(t *testing.T) {
-	params := resource.PutParams{}
+	params := out.PutParams{}
 
 	err := params.ValidateParams()
 	assert.NotNil(t, err)
@@ -27,7 +27,7 @@ func TestPutParamsValidateNoReportType(t *testing.T) {
 
 func TestPutParamsValidateInvalidType(t *testing.T) {
 	report_type := "invalid"
-	params := resource.PutParams{
+	params := out.PutParams{
 		ReportType: report_type,
 	}
 
@@ -39,7 +39,7 @@ func TestPutParamsValidateInvalidType(t *testing.T) {
 
 func TestPutParamsValidateNotYetImplemented(t *testing.T) {
 	report_type := "Burp Scan"
-	params := resource.PutParams{
+	params := out.PutParams{
 		ReportType: report_type,
 	}
 
