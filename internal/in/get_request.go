@@ -1,6 +1,7 @@
 package in
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
@@ -15,9 +16,13 @@ func (g GetRequest) Validate() error {
 	return fmt.Errorf("not implemented yet")
 }
 
-type GetParams struct {
-}
+func DecodeToGetRequest(c *concourse.Concourse) (*GetRequest, error) {
+	decoder := json.NewDecoder(c.In)
+	decoder.DisallowUnknownFields()
 
-func (p GetParams) ValidateParams() error {
-	return fmt.Errorf("not implemented yet")
+	var req GetRequest
+	if err := decoder.Decode(&req); err != nil {
+		return nil, err
+	}
+	return &req, nil
 }

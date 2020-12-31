@@ -39,10 +39,12 @@ func TestDecodeToPutRequestWorks(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"defectdojo_url": "something"
+			"defectdojo_url": "http://something",
+			"username": "exists",
+			"api_key": "also exists"
 		},
 		"params": {
-			"report_type": "something"
+			"report_type": "ZAP Scan"
 		}
 	}`))
 
