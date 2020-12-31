@@ -25,28 +25,31 @@ func NewDefectdojoClient(url string, api_key string) *DefectdojoClient {
 	return &client
 }
 
-func (c *DefectdojoClient) GetIdForProduct(name string) error {
+func (c *DefectdojoClient) GetIdForProduct(name string) (int, error) {
+	products, err := c.GetListOfProducts(name)
+	if err != nil {
+		return 0, err
+	}
+
+	// find the right product in the list
+	logrus.Debugln(products)
+	return products, nil
+}
+
+func (c *DefectdojoClient) GetListOfProducts(name string) (int, error) {
 	url_path := fmt.Sprintf("%s/api/v2/products", c.url)
 	req, err := http.NewRequest(http.MethodGet, url_path, nil)
 	if err != nil {
-		return fmt.Errorf("something went wrong building request: %s", err)
+		return 0, fmt.Errorf("something went wrong building request: %s", err)
 	}
 
-	token_str := fmt.Sprintf("Token %s", c.api_key)
-	req.Header.Add("Authorization", token_str)
-
-	logrus.Debugln("grabbing list of products just to confirm we can auth")
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.DoRequest(req)
 	if err != nil {
-		return fmt.Errorf("recieved some kind of error: %s", err)
+		return 0, fmt.Errorf("request failed: %s", err)
 	}
-	defer resp.Body.Close()
+	logrus.Debugln(resp)
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("received status code of `%d`", resp.StatusCode)
-	}
-
-	return nil
+	return 1, nil
 }
 
 func (c *DefectdojoClient) GetOrCreateEngagement() (int, error) {
