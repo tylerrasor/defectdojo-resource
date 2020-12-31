@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
-	"github.com/tylerrasor/defectdojo-resource/client"
 	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
+	"github.com/tylerrasor/defectdojo-resource/pkg/defectdojo_client"
 )
 
 func Get(c *concourse.Concourse) error {
@@ -21,12 +21,7 @@ func Get(c *concourse.Concourse) error {
 		logrus.Debugln("debug logging on")
 	}
 
-	logrus.Debugln("creating http client")
-	client, err := client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.Username, request.Source.Password, request.Source.ApiKey)
-	if err != nil {
-		return fmt.Errorf("error creating client to interact with defectdojo: %s", err)
-	}
-
+	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
 	something, err := client.GetSomethingForIn()
 	if err != nil {
 		return fmt.Errorf("error getting something: %s", err)
