@@ -5,20 +5,21 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
-	resource "github.com/tylerrasor/defectdojo-resource/internal"
+	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
+	"github.com/tylerrasor/defectdojo-resource/internal/out"
 )
 
 func main() {
 	color.NoColor = false
 
-	command := resource.NewConcourse(
+	command := concourse.NewConcourse(
 		os.Stdin,
 		os.Stderr,
 		os.Stdout,
 		os.Args,
 	)
 
-	if err := command.Put(); err != nil {
+	if err := out.Put(command); err != nil {
 		logrus.SetOutput(os.Stderr)
 		logrus.Errorf("%s", err)
 		os.Exit(1)

@@ -1,14 +1,14 @@
-package resource_test
+package in_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/internal"
+	"github.com/tylerrasor/defectdojo-resource/internal/in"
 )
 
 func TestGetParamsValidate(t *testing.T) {
-	params := resource.GetParams{}
+	params := in.GetParams{}
 
 	err := params.ValidateParams()
 	assert.NotNil(t, err)

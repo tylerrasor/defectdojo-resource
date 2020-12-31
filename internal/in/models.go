@@ -1,12 +1,14 @@
-package resource
+package in
 
 import (
 	"fmt"
+
+	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
 )
 
 type GetRequest struct {
-	Source Source    `json:"source"`
-	Params GetParams `json:"params"`
+	Source concourse.Source `json:"source"`
+	Params GetParams        `json:"params"`
 }
 
 func (g GetRequest) Validate() error {

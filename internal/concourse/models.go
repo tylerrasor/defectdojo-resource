@@ -1,4 +1,4 @@
-package resource
+package concourse
 
 import (
 	"encoding/json"
@@ -14,18 +14,18 @@ func NewConcourse(
 	args []string,
 ) *Concourse {
 	return &Concourse{
-		stdin:  stdin,
-		stderr: stderr,
-		stdout: stdout,
-		args:   args,
+		In:   stdin,
+		Err:  stderr,
+		Out:  stdout,
+		Args: args,
 	}
 }
 
 type Concourse struct {
-	stdin  io.Reader
-	stderr io.Writer
-	stdout io.Writer
-	args   []string
+	In   io.Reader
+	Err  io.Writer
+	Out  io.Writer
+	Args []string
 }
 
 type Response struct {
@@ -45,7 +45,7 @@ type Source struct {
 }
 
 func (c *Concourse) WriteResponseToConcourse(response Response) error {
-	return json.NewEncoder(c.stdout).Encode(response)
+	return json.NewEncoder(c.Out).Encode(response)
 }
 
 func (s *Source) ValidateSource() error {

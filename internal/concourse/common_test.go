@@ -1,4 +1,4 @@
-package resource_test
+package concourse_test
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/internal"
+	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
 )
 
 // not sure how much value this actually provides, but at least we know we have
@@ -14,14 +14,14 @@ import (
 func TestBuildRespone(t *testing.T) {
 	var mock_stdout bytes.Buffer
 
-	out := resource.NewConcourse(
+	out := concourse.NewConcourse(
 		os.Stdin,
 		os.Stderr,
 		&mock_stdout,
 		nil,
 	)
 
-	err := resource.OutputVersionToConcourse(out)
+	err := concourse.OutputVersionToConcourse(out)
 
 	assert.Nil(t, err)
 	expected := "{\"version\":{\"version\":\"need to figure out unique combination of app name, version, build number, something\"}}\n"

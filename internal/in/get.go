@@ -1,4 +1,4 @@
-package resource
+package in
 
 import (
 	"encoding/json"
@@ -6,12 +6,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/tylerrasor/defectdojo-resource/client"
+	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
 )
 
-func (c *Concourse) Put() error {
-	logrus.SetOutput(c.stderr)
+func Get(c *concourse.Concourse) error {
+	logrus.SetOutput(c.Err)
 
-	request, err := DecodeToPutRequest(c)
+	request, err := DecodeToGetRequest(c)
 	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
@@ -27,25 +28,24 @@ func (c *Concourse) Put() error {
 		return fmt.Errorf("error creating client to interact with defectdojo: %s", err)
 	}
 
-	engagement_id, err := client.GetOrCreateEngagement()
+	something, err := client.GetSomethingForIn()
 	if err != nil {
-		return fmt.Errorf("error getting or creating engagement: %s", err)
+		return fmt.Errorf("error getting something: %s", err)
 	}
-	logrus.Debugln(engagement_id)
+	logrus.Debugln(something)
 
-	// dump the response to stdout for concourse
-	if err := OutputVersionToConcourse(c); err != nil {
+	if err := concourse.OutputVersionToConcourse(c); err != nil {
 		return fmt.Errorf("error encoding response to JSON: %s", err)
 	}
 
 	return nil
 }
 
-func DecodeToPutRequest(c *Concourse) (*PutRequest, error) {
-	decoder := json.NewDecoder(c.stdin)
+func DecodeToGetRequest(c *concourse.Concourse) (*GetRequest, error) {
+	decoder := json.NewDecoder(c.In)
 	decoder.DisallowUnknownFields()
 
-	var req PutRequest
+	var req GetRequest
 	if err := decoder.Decode(&req); err != nil {
 		return nil, err
 	}

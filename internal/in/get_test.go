@@ -1,4 +1,4 @@
-package resource_test
+package in_test
 
 import (
 	"bytes"
@@ -6,7 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	resource "github.com/tylerrasor/defectdojo-resource/internal"
+	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
+	"github.com/tylerrasor/defectdojo-resource/internal/in"
 )
 
 func TestDecodeToGetRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
@@ -19,14 +20,14 @@ func TestDecodeToGetRequestThrowsErrorWhenUnexpectedKey(t *testing.T) {
 		"unexpectedkey": {}
 	}`))
 
-	c := resource.NewConcourse(
+	c := concourse.NewConcourse(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	get, err := resource.DecodeToGetRequest(c)
+	get, err := in.DecodeToGetRequest(c)
 
 	assert.NotNil(t, err)
 	assert.Nil(t, get)
@@ -43,14 +44,14 @@ func TestDecodeToGetRequestWorks(t *testing.T) {
 		"params": {}
 	}`))
 
-	c := resource.NewConcourse(
+	c := concourse.NewConcourse(
 		&mock_stdin,
 		os.Stderr,
 		os.Stdout,
 		nil,
 	)
 
-	get, err := resource.DecodeToGetRequest(c)
+	get, err := in.DecodeToGetRequest(c)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, get)
