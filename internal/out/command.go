@@ -30,7 +30,7 @@ func Put(w *concourse.Worker) error {
 	}
 
 	logrus.Debugln("creating new cicd engagement")
-	engagement_id, err := c.GetOrCreateEngagement(p)
+	engagement_id, err := c.CreateEngagement(p)
 	if err != nil {
 		return fmt.Errorf("error getting or creating engagement: %s", err)
 	}

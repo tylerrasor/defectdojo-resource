@@ -55,6 +55,6 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 	return p, nil
 }
 
-func (c *DefectdojoClient) GetOrCreateEngagement(p *Product) (int, error) {
+func (c *DefectdojoClient) CreateEngagement(p *Product) (int, error) {
 	return 0, fmt.Errorf("not implemented")
 }

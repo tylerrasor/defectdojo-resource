@@ -60,3 +60,16 @@ func TestGetProductNotInList(t *testing.T) {
 	assert.Errorf(t, err, message)
 	assert.Nil(t, p)
 }
+
+func TestCreateEngagement(t *testing.T) {
+	mocK_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mocK_server.URL, "api_key")
+
+	p := defectdojo_client.Product{}
+	_, err := c.CreateEngagement(&p)
+
+	assert.Nil(t, err)
+}
