@@ -36,14 +36,21 @@ func Put(w *concourse.Worker) error {
 	}
 	logrus.Debugf("built new engagement, with id: %d", engagement.EngagementId)
 
+	workdir := w.Args[1]
+	full_path := fmt.Sprintf("%s/%s", workdir, request.Params.ReportPath)
+	logrus.Debugf("checking that file exists: %s", full_path)
+	if err := w.FileExists(full_path); err != nil {
+		return fmt.Errorf("error reading report file: %s", err)
+	}
+
 	logrus.Debugln("uploading report")
-	if err := c.UploadReport(request.Params.ReportType, request.Params.ReportPath, engagement.EngagementId); err != nil {
+	if err := c.UploadReport(engagement.EngagementId, request.Params.ReportType, request.Params.ReportPath); err != nil {
 		return fmt.Errorf("error uploading report: %s", err)
 	}
 
 	r := concourse.Response{
 		Version: concourse.Version{
-			Version: "need to figure out unique combination of app name, version, build number, something",
+			Version: fmt.Sprint(engagement.EngagementId),
 		},
 	}
 	if err := w.OutputResponseToConcourse(r); err != nil {
