@@ -1,6 +1,7 @@
 package defectdojo_client
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -57,29 +58,41 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 
 type Engagement struct {
 	EngagementId int    `json:"id"`
-	ProductId    string `json:"product"`
+	ProductId    int    `json:"product"`
 	StartDate    string `json:"target_start"`
 	EndDate      string `json:"target_end"`
 }
 
-func (c *DefectdojoClient) CreateEngagement(p *Product) (int, error) {
+func (c *DefectdojoClient) CreateEngagement(p *Product) (*Engagement, error) {
 	url := fmt.Sprintf("%s/api/v2/engagements", c.url)
 
-	req, err := http.NewRequest(http.MethodPost, url, nil)
-	if err != nil {
-		return 0, fmt.Errorf("something went wrong building request: %s", err)
+	engagement_req := Engagement{
+		ProductId: p.Id,
+		StartDate: "2021-01-01",
+		EndDate:   "2021-01-01",
 	}
+	bytez, err := json.Marshal(engagement_req)
+	if err != nil {
+		return nil, fmt.Errorf("could not marshal to json: %s", err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(bytez))
+	if err != nil {
+		return nil, fmt.Errorf("something went wrong building request: %s", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := c.DoRequest(req)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
+	defer resp.Body.Close()
 
 	var e *Engagement
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&e); err != nil {
-		return 0, fmt.Errorf("error decoding response: %s", err)
+		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
 
-	return 0, fmt.Errorf("not implemented")
+	return e, nil
 }
