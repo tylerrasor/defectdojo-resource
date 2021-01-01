@@ -21,8 +21,16 @@ func Put(w *concourse.Worker) error {
 		logrus.Debugln("debug logging on")
 	}
 
-	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
-	engagement_id, err := client.GetOrCreateEngagement()
+	c := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
+
+	logrus.Debugln("looking for product profile")
+	p, err := c.GetProduct(request.Source.AppName)
+	if err != nil {
+		return fmt.Errorf("error getting product: %s", err)
+	}
+
+	logrus.Debugln("creating new cicd engagement")
+	engagement_id, err := c.GetOrCreateEngagement(p)
 	if err != nil {
 		return fmt.Errorf("error getting or creating engagement: %s", err)
 	}

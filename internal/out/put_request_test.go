@@ -40,8 +40,8 @@ func TestDecodeToPutRequestWorks(t *testing.T) {
 	{
 		"source": {
 			"defectdojo_url": "http://something",
-			"username": "exists",
-			"api_key": "also exists"
+			"api_key": "also exists",
+			"app_name": "provided"
 		},
 		"params": {
 			"report_type": "ZAP Scan"

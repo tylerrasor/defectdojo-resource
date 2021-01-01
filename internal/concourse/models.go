@@ -15,9 +15,8 @@ type Version struct {
 
 type Source struct {
 	DefectDojoUrl string `json:"defectdojo_url"`
-	Username      string `json:"username"`
-	Password      string `json:"password,omitempty"`
 	ApiKey        string `json:"api_key"`
+	AppName       string `json:"app_name"`
 	Debug         bool   `json:"debug"`
 }
 
@@ -28,11 +27,11 @@ func (s *Source) ValidateSource() error {
 	if !strings.HasPrefix(s.DefectDojoUrl, "http://") && !strings.HasPrefix(s.DefectDojoUrl, "https://") {
 		return fmt.Errorf("Please provide http(s):// prefix in `defectdojo_url`.")
 	}
-	if s.Username == "" {
-		return fmt.Errorf("Required `username` not supplied.")
-	}
 	if s.ApiKey == "" {
 		return fmt.Errorf("Required `api_key` not supplied.")
+	}
+	if s.AppName == "" {
+		return fmt.Errorf("Required `app_name` not supplied.")
 	}
 	return nil
 }

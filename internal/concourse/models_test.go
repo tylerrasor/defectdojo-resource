@@ -10,8 +10,8 @@ import (
 func TestSourceValidate(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "",
-		Username:      "something",
 		ApiKey:        "something",
+		AppName:       "app",
 	}
 	err := source.ValidateSource()
 	assert.NotNil(t, err)
@@ -21,8 +21,8 @@ func TestSourceValidate(t *testing.T) {
 func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "url-without-http.com",
-		Username:      "something",
 		ApiKey:        "something",
+		AppName:       "app",
 	}
 
 	err := source.ValidateSource()
@@ -31,8 +31,8 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 
 	source = concourse.Source{
 		DefectDojoUrl: "http://url-that-should-work.com",
-		Username:      "something",
 		ApiKey:        "something",
+		AppName:       "app",
 	}
 
 	err = source.ValidateSource()
@@ -40,15 +40,26 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 
 	source = concourse.Source{
 		DefectDojoUrl: "https://url-that-should-work.com",
-		Username:      "something",
 		ApiKey:        "something",
+		AppName:       "app",
 	}
 
 	err = source.ValidateSource()
 	assert.Nil(t, err)
 }
 
-func TestSourceValidateUsernameMissing(t *testing.T) {
+func TestSourceValidateApiKeyMissing(t *testing.T) {
+	source := concourse.Source{
+		DefectDojoUrl: "http://something",
+		AppName:       "app",
+	}
+
+	err := source.ValidateSource()
+	assert.NotNil(t, err)
+	assert.EqualError(t, err, "Required `api_key` not supplied.")
+}
+
+func TestSourceValidateAppNameMissing(t *testing.T) {
 	source := concourse.Source{
 		DefectDojoUrl: "http://something",
 		ApiKey:        "something",
@@ -56,16 +67,5 @@ func TestSourceValidateUsernameMissing(t *testing.T) {
 
 	err := source.ValidateSource()
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, "Required `username` not supplied.")
-}
-
-func TestSourceValidateApiKeyMissing(t *testing.T) {
-	source := concourse.Source{
-		DefectDojoUrl: "http://something",
-		Username:      "something",
-	}
-
-	err := source.ValidateSource()
-	assert.NotNil(t, err)
-	assert.EqualError(t, err, "Required `api_key` not supplied.")
+	assert.EqualError(t, err, "Required `app_name` not supplied.")
 }
