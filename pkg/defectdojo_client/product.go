@@ -20,16 +20,16 @@ type Product struct {
 func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 	// get list of products
 	url := fmt.Sprintf("%s/api/v2/products", c.url)
+	logrus.Debugf("GET %s\n", url)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("something went wrong building request: %s", err)
 	}
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := c.DoRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("recieved some kind of error: %s", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
 
 	var results *ProductSearchResults
 	decoder := json.NewDecoder(resp.Body)
@@ -37,8 +37,10 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
 
+	logrus.Debugf("found %d products\n", len(results.ProductList))
 	var p *Product
 	for i := range results.ProductList {
+		logrus.Debugf("product name: %s\n", results.ProductList[i].Name)
 		if results.ProductList[i].Name == name {
 			logrus.Debugln("found product in list")
 			p = &results.ProductList[i]
