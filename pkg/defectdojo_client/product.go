@@ -55,6 +55,31 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 	return p, nil
 }
 
+type Engagement struct {
+	EngagementId int    `json:"id"`
+	ProductId    string `json:"product"`
+	StartDate    string `json:"target_start"`
+	EndDate      string `json:"target_end"`
+}
+
 func (c *DefectdojoClient) CreateEngagement(p *Product) (int, error) {
+	url := fmt.Sprintf("%s/api/v2/engagements", c.url)
+
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		return 0, fmt.Errorf("something went wrong building request: %s", err)
+	}
+
+	resp, err := c.DoRequest(req)
+	if err != nil {
+		return 0, err
+	}
+
+	var e *Engagement
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&e); err != nil {
+		return 0, fmt.Errorf("error decoding response: %s", err)
+	}
+
 	return 0, fmt.Errorf("not implemented")
 }

@@ -42,7 +42,7 @@ func TestDoRequestReturnsResponse(t *testing.T) {
 func TestDoRequestServerError(t *testing.T) {
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Token api_key" {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 		w.WriteHeader(http.StatusTeapot)
 	}))
@@ -52,6 +52,6 @@ func TestDoRequestServerError(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, mock_server.URL, nil)
 	resp, err := c.DoRequest(r)
 
-	assert.Errorf(t, err, "received status code of ``")
+	assert.Errorf(t, err, "received status code of `500`")
 	assert.Nil(t, resp)
 }

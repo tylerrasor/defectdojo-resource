@@ -61,14 +61,19 @@ func TestGetProductNotInList(t *testing.T) {
 	assert.Nil(t, p)
 }
 
-func TestCreateEngagement(t *testing.T) {
+func TestCreateEngagementSuccess(t *testing.T) {
 	mocK_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusOK)
+		e := fmt.Sprintf(`{ "id": 18, "target_start": "2021-01-01", "target_end": "2021-01-01" }`)
+		io.WriteString(w, e)
 	}))
 
 	c := defectdojo_client.NewDefectdojoClient(mocK_server.URL, "api_key")
 
-	p := defectdojo_client.Product{}
+	p := defectdojo_client.Product{
+		Name: "app",
+		Id:   5,
+	}
 	_, err := c.CreateEngagement(&p)
 
 	assert.Nil(t, err)
