@@ -6,8 +6,8 @@ echo \
 '{
   "source": {
     "defectdojo_url": "https://something",
-    "username": "admin",
     "api_key": "key",
+    "app_name": "app",
     "debug": true
   },
   "params": {
