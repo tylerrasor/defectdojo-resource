@@ -12,5 +12,6 @@ func TestGetParamsValidate(t *testing.T) {
 
 	err := params.ValidateParams()
 	assert.NotNil(t, err)
-	assert.Errorf(t, err, "not implemented yet")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "not implemented yet")
 }

@@ -102,6 +102,7 @@ func TestDoRequestServerError(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, mock_server.URL, nil)
 	resp, err := c.DoRequest(r)
 
-	assert.Errorf(t, err, "received status code of `500`")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "received status code of `418`")
 	assert.Nil(t, resp)
 }
