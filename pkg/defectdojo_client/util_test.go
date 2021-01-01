@@ -21,6 +21,25 @@ func TestBuildAuthHeader(t *testing.T) {
 	assert.Equal(t, v, token_str)
 }
 
+func TestDoPostCorrectlyBuildsUrl(t *testing.T) {
+	api_path := "products"
+	payload := defectdojo_client.Engagement{
+		EngagementId: 5,
+	}
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Header.Get("Content-Type"), "application/json")
+		full_url := fmt.Sprintf("/api/v2/%s/", api_path)
+		assert.Equal(t, r.URL.Path, full_url)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	resp, err := c.DoPost(api_path, payload)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resp)
+}
+
 func TestDoRequestReturnsResponse(t *testing.T) {
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Token api_key" {

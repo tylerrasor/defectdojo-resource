@@ -1,12 +1,8 @@
 package defectdojo_client
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Engagement struct {
@@ -19,9 +15,6 @@ type Engagement struct {
 }
 
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*Engagement, error) {
-	url := fmt.Sprintf("%s/api/v2/engagements/", c.url)
-	logrus.Debugf("POST %s", url)
-
 	engagement_req := Engagement{
 		ProductId:      p.Id,
 		StartDate:      "2021-01-01",
@@ -29,20 +22,8 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 		EngagementType: "CI/CD",
 		EngagementName: report_type,
 	}
-	bytez, err := json.Marshal(engagement_req)
-	if err != nil {
-		return nil, fmt.Errorf("could not marshal to json: %s", err)
-	}
 
-	logrus.Debugf("trying to send payload: %s", string(bytez))
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(bytez))
-	if err != nil {
-		return nil, fmt.Errorf("something went wrong building request: %s", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	logrus.Debugln("sending post")
-	resp, err := c.DoRequest(req)
+	resp, err := c.DoPost("engagements", engagement_req)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +38,29 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 	return e, nil
 }
 
-func (c *DefectdojoClient) UploadReport(n, m string) error {
+type Scan struct {
+	Type         string `json:"scan_type"`
+	EngagementId int    `json:"engagement"`
+	Active       bool   `json:"active"`
+}
+
+func (c *DefectdojoClient) UploadReport(report_type string, path string, engagement_id int) error {
+	scan_req := Scan{
+		Type:         report_type,
+		EngagementId: engagement_id,
+	}
+
+	resp, err := c.DoPost("import-scan", scan_req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var e *Engagement
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&e); err != nil {
+		return fmt.Errorf("error decoding response: %s", err)
+	}
+
 	return fmt.Errorf("not implemented")
 }

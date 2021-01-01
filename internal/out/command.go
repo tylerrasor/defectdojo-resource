@@ -37,7 +37,7 @@ func Put(w *concourse.Worker) error {
 	logrus.Debugf("built new engagement, with id: %d", engagement.EngagementId)
 
 	logrus.Debugln("uploading report")
-	if err := c.UploadReport(request.Params.ReportType, request.Params.ReportPath); err != nil {
+	if err := c.UploadReport(request.Params.ReportType, request.Params.ReportPath, engagement.EngagementId); err != nil {
 		return fmt.Errorf("error uploading report: %s", err)
 	}
 
