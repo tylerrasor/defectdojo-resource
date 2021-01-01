@@ -21,6 +21,30 @@ func TestBuildAuthHeader(t *testing.T) {
 	assert.Equal(t, v, token_str)
 }
 
+func TestBuildJsonRequestBytez(t *testing.T) {
+	id := 5
+	target_date := "2021-01-01"
+	e_type := "type"
+	name := "engagement name"
+	payload := defectdojo_client.Engagement{
+		ProductId:      id,
+		StartDate:      target_date,
+		EndDate:        target_date,
+		EngagementType: e_type,
+		EngagementName: name,
+	}
+
+	c := defectdojo_client.NewDefectdojoClient("nil", "nil")
+	bytez, err := c.BuildJsonRequestBytez(payload)
+
+	json := fmt.Sprintf(`{"product":%d,"target_start":"%s","target_end":"%s","engagement_type":"%s","name":"%s"}`, id, target_date, target_date, e_type, name)
+	expected := []byte(json)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, bytez)
+	assert.Equal(t, bytez, expected)
+}
+
 func TestDoPostCorrectlyBuildsUrl(t *testing.T) {
 	api_path := "products"
 	payload := defectdojo_client.Engagement{
@@ -34,7 +58,8 @@ func TestDoPostCorrectlyBuildsUrl(t *testing.T) {
 
 	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
 
-	resp, err := c.DoPost(api_path, payload)
+	bytez, _ := c.BuildJsonRequestBytez(payload)
+	resp, err := c.DoPost(api_path, bytez, defectdojo_client.APPLICATION_JSON)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)

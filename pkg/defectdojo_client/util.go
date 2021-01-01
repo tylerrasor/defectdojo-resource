@@ -42,21 +42,30 @@ func BuildAuthHeader(api_key string) (string, string) {
 // 	return results, nil
 // }
 
-func (c *DefectdojoClient) DoPost(api_path string, req_payload interface{}) (*http.Response, error) {
-	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
-	logrus.Debugf("POST %s", url)
+const APPLICATION_JSON = "application/json"
+const MULTIPART_FORM = "multipart/form-data"
 
+func (c *DefectdojoClient) BuildJsonRequestBytez(req_payload interface{}) ([]byte, error) {
 	bytez, err := json.Marshal(req_payload)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal to json: %s", err)
 	}
+	return bytez, nil
+}
 
-	logrus.Debugf("trying to send payload: %s", string(bytez))
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(bytez))
+func (c *DefectdojoClient) BuildMultipartFormBytez(req_payload interface{}) ([]byte, error) {
+	return nil, fmt.Errorf("not yet implemented")
+}
+
+func (c *DefectdojoClient) DoPost(api_path string, req_payload []byte, content_type string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
+	logrus.Debugf("POST %s", url)
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(req_payload))
 	if err != nil {
 		return nil, fmt.Errorf("something went wrong building request: %s", err)
 	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", content_type)
 
 	logrus.Debugln("sending post")
 	resp, err := c.DoRequest(req)
