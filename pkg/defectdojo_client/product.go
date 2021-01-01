@@ -54,9 +54,10 @@ type Engagement struct {
 	StartDate      string `json:"target_start"`
 	EndDate        string `json:"target_end"`
 	EngagementType string `json:"engagement_type"`
+	EngagementName string `json:"name"`
 }
 
-func (c *DefectdojoClient) CreateEngagement(p *Product) (*Engagement, error) {
+func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*Engagement, error) {
 	url := fmt.Sprintf("%s/api/v2/engagements/", c.url)
 	logrus.Debugf("POST %s", url)
 
@@ -65,6 +66,7 @@ func (c *DefectdojoClient) CreateEngagement(p *Product) (*Engagement, error) {
 		StartDate:      "2021-01-01",
 		EndDate:        "2021-01-01",
 		EngagementType: "CI/CD",
+		EngagementName: report_type,
 	}
 	bytez, err := json.Marshal(engagement_req)
 	if err != nil {
