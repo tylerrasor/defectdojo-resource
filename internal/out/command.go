@@ -30,11 +30,11 @@ func Put(w *concourse.Worker) error {
 	}
 
 	logrus.Debugln("creating new cicd engagement")
-	engagement_id, err := c.GetOrCreateEngagement(p)
+	engagement, err := c.CreateEngagement(p, request.Params.ReportType)
 	if err != nil {
 		return fmt.Errorf("error getting or creating engagement: %s", err)
 	}
-	logrus.Debugln(engagement_id)
+	logrus.Debugf("built new engagement, with id: %d", engagement.EngagementId)
 
 	logrus.Debugln("building response")
 	r := concourse.Response{

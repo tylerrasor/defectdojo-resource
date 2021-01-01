@@ -18,7 +18,7 @@ func (c *DefectdojoClient) DoRequest(req *http.Request) (*http.Response, error) 
 		return nil, fmt.Errorf("recieved some kind of error: %s", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return nil, fmt.Errorf("received status code of `%d`", resp.StatusCode)
 	}
 

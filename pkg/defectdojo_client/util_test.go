@@ -39,10 +39,41 @@ func TestDoRequestReturnsResponse(t *testing.T) {
 	assert.NotNil(t, resp)
 }
 
+func TestDoRequestComplainsifNot200Or201(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer mock_server.Close()
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	req, _ := http.NewRequest(http.MethodGet, mock_server.URL, nil)
+	_, err := c.DoRequest(req)
+
+	assert.Nil(t, err)
+
+	mock_server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+	}))
+
+	req, _ = http.NewRequest(http.MethodGet, mock_server.URL, nil)
+	_, err = c.DoRequest(req)
+
+	assert.Nil(t, err)
+
+	mock_server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+
+	req, _ = http.NewRequest(http.MethodGet, mock_server.URL, nil)
+	_, err = c.DoRequest(req)
+
+	assert.NotNil(t, err)
+}
+
 func TestDoRequestServerError(t *testing.T) {
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Token api_key" {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 		w.WriteHeader(http.StatusTeapot)
 	}))
@@ -52,6 +83,6 @@ func TestDoRequestServerError(t *testing.T) {
 	r, _ := http.NewRequest(http.MethodGet, mock_server.URL, nil)
 	resp, err := c.DoRequest(r)
 
-	assert.Errorf(t, err, "received status code of ``")
+	assert.Errorf(t, err, "received status code of `500`")
 	assert.Nil(t, resp)
 }
