@@ -8,6 +8,7 @@ import (
 
 type PutParams struct {
 	ReportType string `json:"report_type"`
+	ReportPath string `json:"path_to_report"`
 }
 
 func (p PutParams) ValidateParams() error {
@@ -21,6 +22,10 @@ func (p PutParams) ValidateParams() error {
 	}
 	if !implemented {
 		return fmt.Errorf("The specified report type, `%s`, hasn't been implemented yet (pull requests welcome!)", p.ReportType)
+	}
+
+	if p.ReportPath == "" {
+		return fmt.Errorf("Required parameter `path_to_report` not supplied.")
 	}
 
 	return nil

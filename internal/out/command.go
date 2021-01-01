@@ -36,7 +36,11 @@ func Put(w *concourse.Worker) error {
 	}
 	logrus.Debugf("built new engagement, with id: %d", engagement.EngagementId)
 
-	logrus.Debugln("building response")
+	logrus.Debugln("uploading report")
+	if err := c.UploadReport(request.Params.ReportType, request.Params.ReportPath); err != nil {
+		return fmt.Errorf("error uploading report: %s", err)
+	}
+
 	r := concourse.Response{
 		Version: concourse.Version{
 			Version: "need to figure out unique combination of app name, version, build number, something",

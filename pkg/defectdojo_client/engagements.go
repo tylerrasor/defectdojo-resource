@@ -56,3 +56,7 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 
 	return e, nil
 }
+
+func (c *DefectdojoClient) UploadReport(n, m string) error {
+	return fmt.Errorf("not implemented")
+}
