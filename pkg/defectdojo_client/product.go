@@ -33,7 +33,6 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 
 	var results *ProductSearchResults
 	decoder := json.NewDecoder(resp.Body)
-	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&results); err != nil {
 		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
