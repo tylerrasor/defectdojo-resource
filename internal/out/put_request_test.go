@@ -44,7 +44,8 @@ func TestDecodeToPutRequestWorks(t *testing.T) {
 			"app_name": "provided"
 		},
 		"params": {
-			"report_type": "ZAP Scan"
+			"report_type": "ZAP Scan",
+			"path_to_report": "reports/report.txt"
 		}
 	}`))
 

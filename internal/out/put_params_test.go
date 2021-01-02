@@ -11,6 +11,7 @@ import (
 func TestPutParamsValidate(t *testing.T) {
 	params := out.PutParams{
 		ReportType: "ZAP Scan",
+		ReportPath: "reports/report.txt",
 	}
 
 	err := params.ValidateParams()
@@ -47,4 +48,13 @@ func TestPutParamsValidateNotYetImplemented(t *testing.T) {
 	assert.NotNil(t, err)
 	expected := fmt.Sprintf("The specified report type, `%s`, hasn't been implemented yet (pull requests welcome!)", report_type)
 	assert.EqualError(t, err, expected)
+}
+
+func TestPutParamsValidateNoReportPath(t *testing.T) {
+	params := out.PutParams{
+		ReportType: "ZAP Scan",
+	}
+
+	err := params.ValidateParams()
+	assert.EqualError(t, err, "Required parameter `path_to_report` not supplied.")
 }

@@ -38,25 +38,25 @@ func TestGetProductEmptyList(t *testing.T) {
 	name := "app"
 	p, err := c.GetProduct(name)
 
+	assert.Error(t, err)
 	message := fmt.Sprintf("product `%s` not found", name)
-	assert.Errorf(t, err, message)
+	assert.Equal(t, err.Error(), message)
 	assert.Nil(t, p)
 }
 
-func TestGetProductNotInList(t *testing.T) {
-	id := 5
-	name := "app"
-	results := fmt.Sprintf(`{ "results": [ { "id": %d, "name": "%s" } ] }`, id, name)
+func TestGetProductReturnsAList(t *testing.T) {
+	results := fmt.Sprintf(`{ "results": [ {}, {} ] }`)
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, results)
 	}))
 	defer mock_server.Close()
 	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
 
-	other_name := "other name"
-	p, err := c.GetProduct(other_name)
+	name := "app"
+	p, err := c.GetProduct(name)
 
-	message := fmt.Sprintf("product `%s` not found", other_name)
-	assert.Errorf(t, err, message)
+	assert.Error(t, err)
+	message := fmt.Sprintf("not sure how you did it, but got 2 results for product name `%s`", name)
+	assert.Equal(t, err.Error(), message)
 	assert.Nil(t, p)
 }

@@ -3,9 +3,6 @@ package defectdojo_client
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
-	"github.com/sirupsen/logrus"
 )
 
 type ProductSearchResults struct {
@@ -18,15 +15,10 @@ type Product struct {
 }
 
 func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
-	// get list of products
-	url := fmt.Sprintf("%s/api/v2/products/?name=%s", c.url, name)
-	logrus.Debugf("GET %s", url)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("something went wrong building request: %s", err)
+	params := map[string]string{
+		"name": name,
 	}
-
-	resp, err := c.DoRequest(req)
+	resp, err := c.DoGet("products", params)
 	if err != nil {
 		return nil, err
 	}

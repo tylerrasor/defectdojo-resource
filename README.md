@@ -31,6 +31,27 @@ resources:
     defectdojo_url: https://path-to-your-hosted-instance.io
     api_key: ((from-a-secret-manager-probably))
     app_name: "myApp"
+
+jobs:
+- name: scan-and-report
+  plan:
+  - task: do-the-scan
+    config:
+      platform: linux
+      image_resource:
+        type: registry_image
+        source: { repository: alpine }
+      output:
+      - name: reports
+      run:
+        path: sh
+        args:
+          - |
+            echo "do some cool scan" > reports.txt
+  - put: defectdojo
+    params:
+      report_type: demo-scan
+      path_to_report: reports/report.txt
 ```
 
 ## Behavior
@@ -42,3 +63,7 @@ Pushes a report of a given type to Defectdojo for the specified application.
 #### Parameters
 
 * `report_type`: *Required.* The type of report you're trying to upload.  The format of this string must match the internal scan type strings that defectdojo is using, [found here](https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py).
+
+* `path_to_report`: *Required.* File path (passed in from previous task) to the report you're trying to upload.
+
+* `make_active`: *Optional.* Should the scan be marked as `active` as far as findings go.

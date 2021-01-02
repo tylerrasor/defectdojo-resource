@@ -1,12 +1,9 @@
 package defectdojo_client
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Engagement struct {
@@ -19,9 +16,6 @@ type Engagement struct {
 }
 
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*Engagement, error) {
-	url := fmt.Sprintf("%s/api/v2/engagements/", c.url)
-	logrus.Debugf("POST %s", url)
-
 	engagement_req := Engagement{
 		ProductId:      p.Id,
 		StartDate:      "2021-01-01",
@@ -29,30 +23,51 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 		EngagementType: "CI/CD",
 		EngagementName: report_type,
 	}
-	bytez, err := json.Marshal(engagement_req)
-	if err != nil {
-		return nil, fmt.Errorf("could not marshal to json: %s", err)
-	}
 
-	logrus.Debugf("trying to send payload: %s", string(bytez))
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(bytez))
+	payload, err := c.BuildJsonRequestBytez(engagement_req)
 	if err != nil {
-		return nil, fmt.Errorf("something went wrong building request: %s", err)
+		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-
-	logrus.Debugln("sending post")
-	resp, err := c.DoRequest(req)
+	resp, err := c.DoPost("engagements", payload, APPLICATION_JSON)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
+	e, err := decodeToEngagement(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, report_bytez []byte) (*Engagement, error) {
+	form := map[string]string{
+		"engagement": fmt.Sprint(engagement_id),
+		"scan_type":  report_type,
+	}
+
+	bytez, header, err := c.BuildMultipartFormBytez(form, report_bytez)
+	resp, err := c.DoPost("import-scan", bytez, header)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	e, err := decodeToEngagement(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func decodeToEngagement(resp *http.Response) (*Engagement, error) {
 	var e *Engagement
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&e); err != nil {
 		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
-
 	return e, nil
 }
