@@ -70,15 +70,17 @@ func (c *DefectdojoClient) DoPost(api_path string, req_payload *bytes.Buffer, co
 
 func (c *DefectdojoClient) DoGet(api_path string, params map[string]string) (*http.Response, error) {
 	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
-	for k, v := range params {
-		url = fmt.Sprintf("%s?%s=%s", url, k, v)
-	}
-	logrus.Debugf("GET %s", url)
-
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("something went wrong building the request: %s", err)
 	}
+
+	q := req.URL.Query()
+	for k, v := range params {
+		q.Add(k, v)
+	}
+	req.URL.RawQuery = q.Encode()
+	logrus.Debugf("GET %s", req.URL.RawPath)
 
 	return c.DoRequest(req)
 }

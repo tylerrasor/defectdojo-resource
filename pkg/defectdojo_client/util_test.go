@@ -94,6 +94,29 @@ func TestDoPostCorrectlyBuildsUrl(t *testing.T) {
 	assert.NotNil(t, resp)
 }
 
+func TestDoGetCorrectlyBuildsUrl(t *testing.T) {
+	api_path := "products"
+	k1 := "param"
+	v1 := "value"
+	k2 := "param2"
+	v2 := "value2"
+	params := map[string]string{
+		k1: v1,
+		k2: v2,
+	}
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, r.Method, http.MethodGet)
+		full_url := fmt.Sprintf("/api/v2/%s/", api_path)
+		assert.Equal(t, r.URL.Path, full_url)
+		assert.Equal(t, r.URL.Query().Get(k1), v1)
+		assert.Equal(t, r.URL.Query().Get(k2), v2)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	c.DoGet(api_path, params)
+}
+
 func TestDoRequestReturnsResponse(t *testing.T) {
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Token api_key" {
