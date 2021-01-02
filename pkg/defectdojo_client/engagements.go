@@ -3,6 +3,7 @@ package defectdojo_client
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 type Engagement struct {
@@ -33,10 +34,9 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 	}
 	defer resp.Body.Close()
 
-	var e *Engagement
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&e); err != nil {
-		return nil, fmt.Errorf("error decoding response: %s", err)
+	e, err := decodeToEngagement(resp)
+	if err != nil {
+		return nil, err
 	}
 
 	return e, nil
@@ -55,11 +55,19 @@ func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, r
 	}
 	defer resp.Body.Close()
 
+	e, err := decodeToEngagement(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func decodeToEngagement(resp *http.Response) (*Engagement, error) {
 	var e *Engagement
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&e); err != nil {
 		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
-
 	return e, nil
 }
