@@ -23,7 +23,11 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 		EngagementName: report_type,
 	}
 
-	resp, err := c.DoPost("engagements", engagement_req)
+	payload, err := c.BuildJsonRequestBytez(engagement_req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.DoPost("engagements", payload, APPLICATION_JSON)
 	if err != nil {
 		return nil, err
 	}
@@ -38,29 +42,24 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 	return e, nil
 }
 
-type Scan struct {
-	Type         string `json:"scan_type"`
-	EngagementId int    `json:"engagement"`
-	Active       bool   `json:"active"`
-}
-
-func (c *DefectdojoClient) UploadReport(report_type string, path string, engagement_id int) error {
-	scan_req := Scan{
-		Type:         report_type,
-		EngagementId: engagement_id,
+func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, report_bytez []byte) (*Engagement, error) {
+	form := map[string]string{
+		"engagement": fmt.Sprint(engagement_id),
+		"scan_type":  report_type,
 	}
 
-	resp, err := c.DoPost("import-scan", scan_req)
+	bytez, header, err := c.BuildMultipartFormBytez(form, report_bytez)
+	resp, err := c.DoPost("import-scan", bytez, header)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var e *Engagement
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&e); err != nil {
-		return fmt.Errorf("error decoding response: %s", err)
+		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
 
-	return fmt.Errorf("not implemented")
+	return e, nil
 }

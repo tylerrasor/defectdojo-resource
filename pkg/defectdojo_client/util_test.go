@@ -1,6 +1,7 @@
 package defectdojo_client_test
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -38,11 +39,39 @@ func TestBuildJsonRequestBytez(t *testing.T) {
 	bytez, err := c.BuildJsonRequestBytez(payload)
 
 	json := fmt.Sprintf(`{"product":%d,"target_start":"%s","target_end":"%s","engagement_type":"%s","name":"%s"}`, id, target_date, target_date, e_type, name)
-	expected := []byte(json)
+	expected := bytes.NewBuffer([]byte(json))
 
 	assert.Nil(t, err)
 	assert.NotNil(t, bytez)
 	assert.Equal(t, bytez, expected)
+}
+
+func TestBuildMultipartFormBytez(t *testing.T) {
+	k1 := "key"
+	v1 := "value"
+	k2 := "file"
+	v2 := "path"
+	fields := map[string]string{
+		k1: v1,
+		k2: v2,
+	}
+	data := []byte("test")
+
+	c := defectdojo_client.NewDefectdojoClient("nil", "nil")
+	bytez, header, err := c.BuildMultipartFormBytez(fields, data)
+
+	// this isn't awesome, just asserting that those strings are set in the data
+	// but not necessarily in the right order, should be close enough
+	expected := `Content-Disposition: form-data; name="key"`
+	expected2 := `Content-Disposition: form-data; name="file";`
+	expected3 := `Content-Type: text/xml`
+
+	assert.Nil(t, err)
+	assert.NotNil(t, bytez)
+	assert.Contains(t, bytez.String(), expected)
+	assert.Contains(t, bytez.String(), expected2)
+	assert.Contains(t, bytez.String(), expected3)
+	assert.Contains(t, header, "multipart/form-data; boundary=")
 }
 
 func TestDoPostCorrectlyBuildsUrl(t *testing.T) {

@@ -6,11 +6,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (w *Worker) FileExists(path string) error {
+func (w *Worker) ReadFile(path string) ([]byte, error) {
 	logrus.New().Debugf("checking for file: %s", path)
-	_, err := ioutil.ReadFile(path)
+	bytez, err := ioutil.ReadFile(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return bytez, nil
 }

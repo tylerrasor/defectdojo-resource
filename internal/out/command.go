@@ -38,19 +38,21 @@ func Put(w *concourse.Worker) error {
 
 	workdir := w.Args[1]
 	full_path := fmt.Sprintf("%s/%s", workdir, request.Params.ReportPath)
-	logrus.Debugf("checking that file exists: %s", full_path)
-	if err := w.FileExists(full_path); err != nil {
+	logrus.Debugf("trying to read file: %s", full_path)
+	bytez, err := w.ReadFile(full_path)
+	if err != nil {
 		return fmt.Errorf("error reading report file: %s", err)
 	}
 
 	logrus.Debugln("uploading report")
-	if err := c.UploadReport(engagement.EngagementId, request.Params.ReportType, request.Params.ReportPath); err != nil {
+	e, err := c.UploadReport(engagement.EngagementId, request.Params.ReportType, bytez)
+	if err != nil {
 		return fmt.Errorf("error uploading report: %s", err)
 	}
 
 	r := concourse.Response{
 		Version: concourse.Version{
-			Version: fmt.Sprint(engagement.EngagementId),
+			Version: fmt.Sprint(e.EngagementId),
 		},
 	}
 	if err := w.OutputResponseToConcourse(r); err != nil {

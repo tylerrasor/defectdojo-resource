@@ -36,3 +36,27 @@ func TestCreateEngagementSetsReportName(t *testing.T) {
 	assert.Equal(t, e.ProductId, app_id)
 	assert.Equal(t, e.EngagementName, report_type)
 }
+
+func TestUploadReport(t *testing.T) {
+	id := 18
+	target_date := "2021-01-01"
+	app_id := 5
+	report_type := "report"
+	mocK_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		e := fmt.Sprintf(`{ "id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
+		io.WriteString(w, e)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mocK_server.URL, "api_key")
+
+	e, err := c.UploadReport(id, report_type, nil)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, e)
+	assert.Equal(t, e.EngagementId, id)
+	assert.Equal(t, e.EngagementName, report_type)
+	assert.Equal(t, e.ProductId, app_id)
+	assert.Equal(t, e.StartDate, target_date)
+	assert.Equal(t, e.EndDate, target_date)
+}

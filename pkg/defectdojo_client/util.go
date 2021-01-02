@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 
 	"github.com/sirupsen/logrus"
 )
@@ -14,54 +16,44 @@ func BuildAuthHeader(api_key string) (string, string) {
 	return "Authorization", token_str
 }
 
-// func (c *DefectdojoClient) DoGet(resp_obj Response, api_path string, query_params ...string) (*Response, error) {
-// 	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
-// 	for i := range query_params {
-// 		if i%2 == 0 {
-// 			url = fmt.Sprintf("?%s=%s", url, query_params[i], query_params[i+1])
-// 		}
-// 	}
-// 	logrus.Debugf("GET %s", url)
-
-// 	req, err := http.NewRequest(http.MethodGet, url, nil)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("something went wrong building request: %s", err)
-// 	}
-
-// 	resp, err := c.DoRequest(req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	results := resp_obj.NewOfType()
-// 	decoder := json.NewDecoder(resp.Body)
-// 	if err := decoder.Decode(&results); err != nil {
-// 		return nil, fmt.Errorf("error decoding response: %s", err)
-// 	}
-
-// 	return results, nil
-// }
-
 const APPLICATION_JSON = "application/json"
-const MULTIPART_FORM = "multipart/form-data"
 
-func (c *DefectdojoClient) BuildJsonRequestBytez(req_payload interface{}) ([]byte, error) {
+func (c *DefectdojoClient) BuildJsonRequestBytez(req_payload interface{}) (*bytes.Buffer, error) {
 	bytez, err := json.Marshal(req_payload)
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal to json: %s", err)
 	}
-	return bytez, nil
+	return bytes.NewBuffer(bytez), nil
 }
 
-func (c *DefectdojoClient) BuildMultipartFormBytez(req_payload interface{}) ([]byte, error) {
-	return nil, fmt.Errorf("not yet implemented")
+func (c *DefectdojoClient) BuildMultipartFormBytez(values map[string]string, bytez []byte) (*bytes.Buffer, string, error) {
+	var b bytes.Buffer
+	f := multipart.NewWriter(&b)
+
+	for k, v := range values {
+		f.WriteField(k, v)
+	}
+	w, _ := f.CreatePart(textproto.MIMEHeader{
+		"Content-Type":        []string{"text/xml"},
+		"Content-Disposition": []string{`form-data; name="file"; filename="report.xml"`},
+	})
+	w.Write(bytez)
+	f.Close()
+
+	return &b, f.FormDataContentType(), nil
 }
 
-func (c *DefectdojoClient) DoPost(api_path string, req_payload []byte, content_type string) (*http.Response, error) {
+type PostErrors struct {
+	NonFieldErrors []string `json:"non_field_errors"`
+	FileErrors     []string `json:"file"`
+}
+
+func (c *DefectdojoClient) DoPost(api_path string, req_payload *bytes.Buffer, content_type string) (*http.Response, error) {
 	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
 	logrus.Debugf("POST %s", url)
+	logrus.Debugf("data: %s", string(req_payload.Bytes()))
 
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(req_payload))
+	req, err := http.NewRequest(http.MethodPost, url, req_payload)
 	if err != nil {
 		return nil, fmt.Errorf("something went wrong building request: %s", err)
 	}
@@ -76,6 +68,21 @@ func (c *DefectdojoClient) DoPost(api_path string, req_payload []byte, content_t
 	return resp, nil
 }
 
+func (c *DefectdojoClient) DoGet(api_path string, params map[string]string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/api/v2/%s/", c.url, api_path)
+	for k, v := range params {
+		url = fmt.Sprintf("%s?%s=%s", url, k, v)
+	}
+	logrus.Debugf("GET %s", url)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("something went wrong building the request: %s", err)
+	}
+
+	return c.DoRequest(req)
+}
+
 func (c *DefectdojoClient) DoRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Add(BuildAuthHeader(c.api_key))
 
@@ -85,6 +92,12 @@ func (c *DefectdojoClient) DoRequest(req *http.Request) (*http.Response, error) 
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		if resp.Body != nil {
+			var e PostErrors
+			decoder := json.NewDecoder(resp.Body)
+			decoder.Decode(&e)
+			logrus.Debugf("response that came back with error: %s, %s", e.NonFieldErrors, e.FileErrors)
+		}
 		return nil, fmt.Errorf("received status code of `%d`", resp.StatusCode)
 	}
 
