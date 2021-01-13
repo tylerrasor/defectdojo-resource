@@ -17,7 +17,7 @@ func (g GetRequest) Validate() error {
 }
 
 func DecodeToGetRequest(w *concourse.Worker) (*GetRequest, error) {
-	decoder := json.NewDecoder(w.In)
+	decoder := json.NewDecoder(w.Stdin)
 	decoder.DisallowUnknownFields()
 
 	var req GetRequest

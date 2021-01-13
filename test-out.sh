@@ -11,7 +11,8 @@ echo \
     "debug": true
   },
   "params": {
-    "report_type": "ZAP Scan"
+    "report_type": "ZAP Scan",
+    "path_to_report": "something"
   }
 }' | ./out
 

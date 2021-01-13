@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/sirupsen/logrus"
 	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
 )
 
@@ -26,10 +25,10 @@ func (r PutRequest) ValidateRequest() error {
 }
 
 func DecodeToPutRequest(w *concourse.Worker) (*PutRequest, error) {
-	decoder := json.NewDecoder(w.In)
+	decoder := json.NewDecoder(w.Stdin)
 	decoder.DisallowUnknownFields()
 
-	logrus.Debugln("decoding the concourse input to put request")
+	w.LogDebug("decoding the concourse input to put request")
 	var req PutRequest
 	if err := decoder.Decode(&req); err != nil {
 		return nil, err

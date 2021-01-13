@@ -3,22 +3,18 @@ package in
 import (
 	"fmt"
 
-	"github.com/sirupsen/logrus"
 	"github.com/tylerrasor/defectdojo-resource/internal/concourse"
 	"github.com/tylerrasor/defectdojo-resource/pkg/defectdojo_client"
 )
 
 func Get(w *concourse.Worker) error {
-	logrus.SetOutput(w.Err)
-
 	request, err := DecodeToGetRequest(w)
 	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
 
 	if request.Source.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
-		logrus.Debugln("debug logging on")
+		w.EnableDebugLog()
 	}
 
 	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
@@ -26,9 +22,9 @@ func Get(w *concourse.Worker) error {
 	if err != nil {
 		return fmt.Errorf("error getting something: %s", err)
 	}
-	logrus.Debugln(something)
+	w.LogDebug(something)
 
-	logrus.Debugln("building response object")
+	w.LogDebug("building response object")
 	r := concourse.Response{
 		Version: concourse.Version{
 			Version: "need to figure out unique combination of app name, version, build number, something",
