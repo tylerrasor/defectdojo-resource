@@ -34,3 +34,17 @@ func TestOutputVersionResponseToConcourse(t *testing.T) {
 	expected := fmt.Sprintf("{\"version\":{\"version\":\"%s\"}}\n", r.Version.Version)
 	assert.Equal(t, expected, mock_stdout.String())
 }
+
+func TestGetWorkDirReturnsCliArg(t *testing.T) {
+	mock_args := []string{"arg0", "arg1", "arg2"}
+	w := concourse.AttachToWorker(
+		os.Stdin,
+		os.Stderr,
+		os.Stdout,
+		mock_args,
+	)
+
+	d := w.GetWorkDir()
+
+	assert.Equal(t, d, "arg1")
+}

@@ -3,6 +3,8 @@ package concourse
 import (
 	"encoding/json"
 	"io"
+
+	"github.com/sirupsen/logrus"
 )
 
 func AttachToWorker(
@@ -11,21 +13,28 @@ func AttachToWorker(
 	stdout io.Writer,
 	args []string,
 ) *Worker {
-	return &Worker{
-		In:   stdin,
-		Err:  stderr,
-		Out:  stdout,
-		Args: args,
+	w := Worker{
+		Stdin:  stdin,
+		stderr: stderr,
+		stdout: stdout,
+		args:   args,
 	}
+	w.setUpLogger()
+	return &w
 }
 
 type Worker struct {
-	In   io.Reader
-	Err  io.Writer
-	Out  io.Writer
-	Args []string
+	Stdin  io.Reader
+	stderr io.Writer
+	stdout io.Writer
+	args   []string
+	logger *logrus.Logger
 }
 
 func (w *Worker) OutputResponseToConcourse(r Response) error {
-	return json.NewEncoder(w.Out).Encode(r)
+	return json.NewEncoder(w.stdout).Encode(r)
+}
+
+func (w *Worker) GetWorkDir() string {
+	return w.args[1]
 }
