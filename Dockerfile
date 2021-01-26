@@ -4,7 +4,7 @@ COPY . /resource
 
 ENV CGO_ENABLED 0
 RUN test -z $(gofmt -l ./internal/* ./pkg/*)
-RUN go test ./internal/* ./pkg/* -failfast -cover
+RUN go test ./... -failfast -cover
 
 RUN mkdir /resource/bin
 RUN go build -o /resource/bin/check ./cmd/check
