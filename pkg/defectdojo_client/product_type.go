@@ -33,7 +33,7 @@ func (c *DefectdojoClient) GetProductType(name string) (*ProductType, error) {
 		return nil, fmt.Errorf("product `%s` not found", name)
 	}
 	if len(results.ProductTypeList) > 1 {
-		return nil, fmt.Errorf("not sure how you did it, but got %d results for product_type name `%s`", len(results.ProductTypeList), name)
+		return nil, fmt.Errorf("not sure how you did it, but you got `%d` results for product_type name `%s`", len(results.ProductTypeList), name)
 	}
 
 	return &results.ProductTypeList[0], nil
