@@ -96,3 +96,53 @@ func TestGetProductTypeReturnsCorrectProductType(t *testing.T) {
 	assert.Equal(t, product_name, product_type.Name)
 	assert.Equal(t, product_id, product_type.Id)
 }
+
+func TestCreateProductTypeReturnsErrorWhenPostFails(t *testing.T) {
+	product_name := "product name"
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	product_type, err := c.CreateProductType(product_name)
+
+	assert.Error(t, err)
+	assert.Nil(t, product_type)
+}
+
+func TestCreateProductTypeReturnsErrorWhenResponseDecodeFails(t *testing.T) {
+	product_name := "product name"
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		pt := fmt.Sprintf(`{ bad json }`)
+		io.WriteString(w, pt)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	product_type, err := c.CreateProductType(product_name)
+
+	assert.Error(t, err)
+	assert.Nil(t, product_type)
+	assert.Contains(t, err.Error(), "error decoding response: ")
+}
+
+func TestCreateProductTypeReturnsCorrectProductType(t *testing.T) {
+	product_name := "product name"
+	product_id := 5
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		pt := fmt.Sprintf(`{ "name": "%s", "id": %d }`, product_name, product_id)
+		io.WriteString(w, pt)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	product_type, err := c.CreateProductType(product_name)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, product_type)
+	assert.Equal(t, product_name, product_type.Name)
+	assert.Equal(t, product_id, product_type.Id)
+}
