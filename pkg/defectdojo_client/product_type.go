@@ -20,13 +20,13 @@ func (c *DefectdojoClient) GetProductType(name string) (*ProductType, error) {
 	}
 	resp, err := c.DoGet("product_types", params)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	var results *ProductTypeSearchResults
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&results); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
 
 	if len(results.ProductTypeList) == 0 {
@@ -37,4 +37,28 @@ func (c *DefectdojoClient) GetProductType(name string) (*ProductType, error) {
 	}
 
 	return &results.ProductTypeList[0], nil
+}
+
+func (c *DefectdojoClient) CreateProductType(name string) (*ProductType, error) {
+	product_type_req := ProductType{
+		Name: name,
+	}
+
+	payload, err := c.BuildJsonRequestBytez(product_type_req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.DoPost("product_types", payload, APPLICATION_JSON)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var pt *ProductType
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&pt); err != nil {
+		return nil, fmt.Errorf("error decoding response: %s", err)
+	}
+
+	return pt, nil
 }
