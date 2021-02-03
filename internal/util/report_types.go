@@ -10,7 +10,7 @@ var SupportedReportTypes = map[string]bool{
 	"Nmap Scan":                    false,
 	"Nikto Scan":                   false,
 	"Nexpose Scan":                 false,
-	"Veracode Scan":                false,
+	"Veracode Scan":                true,
 	"Checkmarx Scan":               false,
 	"Checkmarx Scan detailed":      false,
 	"Contrast Scan":                false,
