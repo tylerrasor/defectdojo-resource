@@ -50,6 +50,7 @@ func (c *DefectdojoClient) CreateProduct(name string, product_type string) (*Pro
 	product_req := Product{
 		Name:          name,
 		ProductTypeId: pt.Id,
+		Description:   "created by CI/CD",
 	}
 
 	payload, err := c.BuildJsonRequestBytez(product_req)
