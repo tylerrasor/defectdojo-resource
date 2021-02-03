@@ -10,8 +10,10 @@ type ProductSearchResults struct {
 }
 
 type Product struct {
-	Name string `json:"name"`
-	Id   int    `json:"id"`
+	Name          string `json:"name"`
+	Id            int    `json:"id,omitempty"`
+	ProductTypeId int    `json:"prod_type"`
+	Description   string `json:"description"`
 }
 
 func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
@@ -37,4 +39,34 @@ func (c *DefectdojoClient) GetProduct(name string) (*Product, error) {
 	}
 
 	return &results.ProductList[0], nil
+}
+
+func (c *DefectdojoClient) CreateProduct(name string, product_type string) (*Product, error) {
+	pt, err := c.GetProductType(product_type)
+	if err != nil {
+		return nil, err
+	}
+
+	product_req := Product{
+		Name:          name,
+		ProductTypeId: pt.Id,
+	}
+
+	payload, err := c.BuildJsonRequestBytez(product_req)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.DoPost("products", payload, APPLICATION_JSON)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var p *Product
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&p); err != nil {
+		return nil, fmt.Errorf("error decoding response: %s", err)
+	}
+
+	return p, nil
 }

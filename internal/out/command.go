@@ -20,9 +20,19 @@ func Put(w *concourse.Worker) error {
 	c := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
 
 	w.LogDebug("looking for product profile")
-	p, err := c.GetProduct(request.Source.AppName)
+	var p *defectdojo_client.Product
+	p, err = c.GetProduct(request.Source.ProductName)
 	if err != nil {
-		return fmt.Errorf("error getting product: %s", err)
+		if !request.Source.CreateProductIfNotExists {
+			w.LogDebug("get product failed but `create_product_if_not_exist` not set")
+			return fmt.Errorf("error getting product: %s", err)
+		} else {
+			w.LogDebug("trying to create product `%s` for product_type `%s`", request.Source.ProductName, request.Source.ProductType)
+			p, err = c.CreateProduct(request.Source.ProductName, request.Source.ProductType)
+			if err != nil {
+				return fmt.Errorf("error creating product '%s' for product_type '%s': %s", request.Source.ProductName, request.Source.ProductType, err)
+			}
+		}
 	}
 
 	w.LogDebug("creating new cicd engagement")

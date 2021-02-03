@@ -14,10 +14,12 @@ type Version struct {
 }
 
 type Source struct {
-	DefectDojoUrl string `json:"defectdojo_url"`
-	ApiKey        string `json:"api_key"`
-	AppName       string `json:"app_name"`
-	Debug         bool   `json:"debug"`
+	DefectDojoUrl            string `json:"defectdojo_url"`
+	ApiKey                   string `json:"api_key"`
+	ProductName              string `json:"product_name"`
+	CreateProductIfNotExists bool   `json:"create_product_if_not_exist"`
+	ProductType              string `json:"product_type"`
+	Debug                    bool   `json:"debug"`
 }
 
 func (s *Source) ValidateSource() error {
@@ -30,8 +32,13 @@ func (s *Source) ValidateSource() error {
 	if s.ApiKey == "" {
 		return fmt.Errorf("Required `api_key` not supplied.")
 	}
-	if s.AppName == "" {
-		return fmt.Errorf("Required `app_name` not supplied.")
+	if s.ProductName == "" {
+		return fmt.Errorf("Required `product_name` not supplied.")
+	}
+	if s.CreateProductIfNotExists {
+		if s.ProductType == "" {
+			return fmt.Errorf("Optional `create_product_if_not_exist` set and required `product_type` not supplied.")
+		}
 	}
 	return nil
 }
