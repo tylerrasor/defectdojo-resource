@@ -6,12 +6,12 @@ Future state?  `In` can be used to get the security posture of a given applicati
 
 ## Source Configuration
 
-| Parameter        | Type   | Required | Default | Description |
-|:-----------------|:-------|:---------|:--------|:------------|
-| `defectdojo_url` | URL    | yes      |         | The path of the hosted instance of defectdojo. |
-| `api_key`        | string | yes      |         | Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html). |
-| `app_name`       | string | yes      |         | Name of the application (product) in defectdojo that we want to interact with. |
-| `debug`          | bool   | no       | `false` | Enable debug logging. |
+| Parameter                     | Type   | Required | Default | Description |
+|:------------------------------|:-------|:---------|:--------|:------------|
+| `defectdojo_url`              | URL    | yes      |         | The path of the hosted instance of defectdojo. |
+| `api_key`                     | string | yes      |         | Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html). |
+| `product_name`                | string | yes      |         | Name of the product (application) in defectdojo that we want to interact with. |
+| `debug`                       | bool   | no       | `false` | Enable debug logging. |
 
 ### Example
 

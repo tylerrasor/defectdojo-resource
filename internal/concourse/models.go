@@ -16,7 +16,7 @@ type Version struct {
 type Source struct {
 	DefectDojoUrl string `json:"defectdojo_url"`
 	ApiKey        string `json:"api_key"`
-	AppName       string `json:"app_name"`
+	ProductName   string `json:"product_name"`
 	Debug         bool   `json:"debug"`
 }
 
@@ -30,8 +30,8 @@ func (s *Source) ValidateSource() error {
 	if s.ApiKey == "" {
 		return fmt.Errorf("Required `api_key` not supplied.")
 	}
-	if s.AppName == "" {
-		return fmt.Errorf("Required `app_name` not supplied.")
+	if s.ProductName == "" {
+		return fmt.Errorf("Required `product_name` not supplied.")
 	}
 	return nil
 }

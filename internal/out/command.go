@@ -20,7 +20,7 @@ func Put(w *concourse.Worker) error {
 	c := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
 
 	w.LogDebug("looking for product profile")
-	p, err := c.GetProduct(request.Source.AppName)
+	p, err := c.GetProduct(request.Source.ProductName)
 	if err != nil {
 		return fmt.Errorf("error getting product: %s", err)
 	}
