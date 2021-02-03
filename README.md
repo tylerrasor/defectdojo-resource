@@ -11,6 +11,8 @@ Future state?  `In` can be used to get the security posture of a given applicati
 | `defectdojo_url`              | URL    | yes      |         | The path of the hosted instance of defectdojo. |
 | `api_key`                     | string | yes      |         | Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html). |
 | `product_name`                | string | yes      |         | Name of the product (application) in defectdojo that we want to interact with. |
+| `create_product_if_not_exist` | bool   | no       | `false` | Do not error when `product_name` does not exist, instead create the `product` profile. |
+| `product_type`                | string | no\*     |         | \*Required when `create_product_if_not_exist` set.  The name of the `product_type` to associate the created `product` with. |
 | `debug`                       | bool   | no       | `false` | Enable debug logging. |
 
 ### Example
