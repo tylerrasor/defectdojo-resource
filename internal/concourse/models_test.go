@@ -14,7 +14,7 @@ func TestSourceValidate(t *testing.T) {
 		ProductName:   "app",
 	}
 	err := source.ValidateSource()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.EqualError(t, err, "Required `defectdojo_url` not supplied.")
 }
 
@@ -26,7 +26,7 @@ func TestSourceValidateChecksForHttpOrHttps(t *testing.T) {
 	}
 
 	err := source.ValidateSource()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.EqualError(t, err, "Please provide http(s):// prefix in `defectdojo_url`.")
 
 	source = concourse.Source{
@@ -55,7 +55,7 @@ func TestSourceValidateApiKeyMissing(t *testing.T) {
 	}
 
 	err := source.ValidateSource()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.EqualError(t, err, "Required `api_key` not supplied.")
 }
 
@@ -66,6 +66,30 @@ func TestSourceValidateProductNameMissing(t *testing.T) {
 	}
 
 	err := source.ValidateSource()
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 	assert.EqualError(t, err, "Required `product_name` not supplied.")
+}
+
+func TestSourceValidateOptionalCreateProductNotSetDoesntError(t *testing.T) {
+	source := concourse.Source{
+		DefectDojoUrl: "http://something",
+		ProductName:   "app",
+		ApiKey:        "something",
+	}
+
+	err := source.ValidateSource()
+	assert.Nil(t, err)
+}
+
+func TestSourceValidateOptionalCreateProductSetDoesErrorWhenProductTypeNotGiven(t *testing.T) {
+	source := concourse.Source{
+		DefectDojoUrl:            "http://something",
+		ProductName:              "app",
+		ApiKey:                   "something",
+		CreateProductIfNotExists: true,
+	}
+
+	err := source.ValidateSource()
+	assert.Error(t, err)
+	assert.EqualError(t, err, "Optional `create_product_if_not_exist` set and required `product_type` not supplied.")
 }
