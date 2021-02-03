@@ -6,13 +6,12 @@ Future state?  `In` can be used to get the security posture of a given applicati
 
 ## Source Configuration
 
-* `defectdojo_url`: *Required.* The path of the hosted instance of defectdojo.
-
-* `api_key`: *Required.* Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html).
-
-* `app_name`: *Required.* Name of the application (product) in defectdojo that we want to interact with.
-
-* `debug`: *Optional.* Enable debug logging.
+| Parameter        | Type   | Required | Default | Description |
+|:-----------------|:-------|:---------|:--------|:------------|
+| `defectdojo_url` | URL    | yes      |         | The path of the hosted instance of defectdojo. |
+| `api_key`        | string | yes      |         | Generated API key (for `username`) to interact with defectdojo, [see here](https://defectdojo.readthedocs.io/en/latest/api-v2-docs.html). |
+| `app_name`       | string | yes      |         | Name of the application (product) in defectdojo that we want to interact with. |
+| `debug`          | bool   | no       | `false` | Enable debug logging. |
 
 ### Example
 
@@ -62,8 +61,8 @@ Pushes a report of a given type to Defectdojo for the specified application.
 
 #### Parameters
 
-* `report_type`: *Required.* The type of report you're trying to upload.  The format of this string must match the internal scan type strings that defectdojo is using, [found here](https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py).
-
-* `path_to_report`: *Required.* File path (passed in from previous task) to the report you're trying to upload.
-
-* `make_active`: *Optional.* Should the scan be marked as `active` as far as findings go.
+| Parameter        | Type   | Required | Default | Description |
+|:-----------------|:-------|:---------|:--------|:------------|
+| `report_type`    | string | yes      |         | The type of report you're trying to upload.  The format of this string must match the internal scan type strings that defectdojo is using, [found here](https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py). |
+| `path_to_report` | string | yes      |         | File path (passed in from previous task) to the report you're trying to upload. |
+| `make_active`    | bool   | no       | `false` | Should the scan be marked as `active` as far as findings go. |
