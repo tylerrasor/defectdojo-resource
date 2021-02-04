@@ -54,7 +54,7 @@ func TestCheckPutsEngagementIdAsVersion(t *testing.T) {
 		io.WriteString(w, e)
 	}))
 
-	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s", "debug": true }, "version": {} }`, mock_server.URL)
+	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s" }, "version": {} }`, mock_server.URL)
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	var mock_stdout bytes.Buffer
 	w := concourse.AttachToWorker(
