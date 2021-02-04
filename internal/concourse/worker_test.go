@@ -24,14 +24,14 @@ func TestOutputVersionResponseToConcourse(t *testing.T) {
 
 	r := concourse.Response{
 		Version: concourse.Version{
-			Version: "0.1",
+			EngagementId: "0.1",
 		},
 	}
 
 	err := w.OutputResponseToConcourse(r)
 
 	assert.Nil(t, err)
-	expected := fmt.Sprintf("{\"version\":{\"version\":\"%s\"}}\n", r.Version.Version)
+	expected := fmt.Sprintf("{\"version\":{\"engagement_id\":\"%s\"}}\n", r.Version.EngagementId)
 	assert.Equal(t, expected, mock_stdout.String())
 }
 
