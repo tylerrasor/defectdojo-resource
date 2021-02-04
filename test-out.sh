@@ -7,12 +7,13 @@ echo \
   "source": {
     "defectdojo_url": "https://something",
     "api_key": "key",
-    "app_name": "app",
+    "product_name": "app",
     "debug": true
   },
   "params": {
     "report_type": "ZAP Scan",
-    "path_to_report": "something"
+    "path_to_report": "something",
+    "close_engagement": true
   }
 }' | ./out
 

@@ -36,7 +36,7 @@ func Put(w *concourse.Worker) error {
 	}
 
 	w.LogDebug("creating new cicd engagement")
-	engagement, err := c.CreateEngagement(p, request.Params.ReportType)
+	engagement, err := c.CreateEngagement(p, request.Params.ReportType, request.Params.CloseEngagement)
 	if err != nil {
 		return fmt.Errorf("error getting or creating engagement: %s", err)
 	}

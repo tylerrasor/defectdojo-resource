@@ -5,8 +5,9 @@ import (
 )
 
 type PutParams struct {
-	ReportType string `json:"report_type"`
-	ReportPath string `json:"path_to_report"`
+	ReportType      string `json:"report_type"`
+	ReportPath      string `json:"path_to_report"`
+	CloseEngagement bool   `json:"close_engagement"`
 }
 
 func (p PutParams) ValidateParams() error {
