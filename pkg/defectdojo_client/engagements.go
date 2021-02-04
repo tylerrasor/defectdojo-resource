@@ -1,27 +1,35 @@
 package defectdojo_client
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Engagement struct {
-	EngagementId   int    `json:"id,omitempty"`
-	ProductId      int    `json:"product"`
-	StartDate      string `json:"target_start"`
-	EndDate        string `json:"target_end"`
-	EngagementType string `json:"engagement_type"`
-	EngagementName string `json:"name"`
+	EngagementId     int    `json:"id,omitempty"`
+	ProductId        int    `json:"product"`
+	StartDate        string `json:"target_start"`
+	EndDate          string `json:"target_end"`
+	EngagementType   string `json:"engagement_type"`
+	EngagementStatus string `json:"status,omitempty"`
+	EngagementName   string `json:"name"`
 }
 
-func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*Engagement, error) {
+func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, close_engagement bool) (*Engagement, error) {
+	ts := time.Now().String()
+	name := fmt.Sprintf("%s - %s", report_type, ts)
 	engagement_req := Engagement{
-		ProductId:      p.Id,
-		StartDate:      "2021-01-01",
-		EndDate:        "2021-01-01",
-		EngagementType: "CI/CD",
-		EngagementName: report_type,
+		ProductId:        p.Id,
+		StartDate:        ts,
+		EndDate:          ts,
+		EngagementType:   "CI/CD",
+		EngagementStatus: "Completed",
+		EngagementName:   name,
 	}
 
 	payload, err := c.BuildJsonRequestBytez(engagement_req)
@@ -37,6 +45,14 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string) (*En
 	e, err := decodeToEngagement(resp)
 	if err != nil {
 		return nil, err
+	}
+
+	if close_engagement {
+		logrus.Debugln("closing engagement because `close_engagement` set")
+		path := fmt.Sprintf("engagements/%d/close", e.EngagementId)
+		if resp, err := c.DoPost(path, &bytes.Buffer{}, APPLICATION_JSON); resp.StatusCode != http.StatusOK || err != nil {
+			return nil, err
+		}
 	}
 
 	return e, nil

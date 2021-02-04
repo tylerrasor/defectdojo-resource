@@ -67,4 +67,4 @@ Pushes a report of a given type to Defectdojo for the specified application.
 |:-----------------|:-------|:---------|:--------|:------------|
 | `report_type`    | string | yes      |         | The type of report you're trying to upload.  The format of this string must match the internal scan type strings that defectdojo is using, [found here](https://github.com/DefectDojo/django-DefectDojo/blob/b08723ded1491d82910e51810de27963ee6ccca2/dojo/tools/factory.py). |
 | `path_to_report` | string | yes      |         | File path (passed in from previous task) to the report you're trying to upload. |
-| `make_active`    | bool   | no       | `false` | Should the scan be marked as `active` as far as findings go. |
+| `close_engagement`    | bool   | no       | `false` | Should the enegagement be closed after report upload. |
