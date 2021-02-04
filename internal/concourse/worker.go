@@ -31,7 +31,7 @@ type Worker struct {
 	logger *logrus.Logger
 }
 
-func (w *Worker) OutputResponseToConcourse(r Response) error {
+func (w *Worker) OutputResponseToConcourse(r interface{}) error {
 	return json.NewEncoder(w.stdout).Encode(r)
 }
 
