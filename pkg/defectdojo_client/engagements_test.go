@@ -13,6 +13,24 @@ import (
 	"github.com/tylerrasor/defectdojo-resource/pkg/defectdojo_client"
 )
 
+func TestGetEngagement(t *testing.T) {
+	id := 18
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		mock_date := "2021-02-04"
+		e := fmt.Sprintf(`{ "id":%d,"target_start":"%s","target_end":"%s","product":5,"name":"name"}`, id, mock_date, mock_date)
+		io.WriteString(w, e)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	e, err := c.GetEngagement(fmt.Sprint(id))
+
+	assert.Nil(t, err)
+	assert.NotNil(t, e)
+	assert.Equal(t, id, e.EngagementId)
+}
+
 func TestCreateEngagementSetsReportName(t *testing.T) {
 	id := 18
 	target_date := "2021-01-01"

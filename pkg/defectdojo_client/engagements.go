@@ -20,6 +20,22 @@ type Engagement struct {
 	EngagementName   string `json:"name"`
 }
 
+func (c *DefectdojoClient) GetEngagement(id string) (*Engagement, error) {
+	path := fmt.Sprintf("engagements/%s", id)
+	params := map[string]string{}
+	resp, err := c.DoGet(path, params)
+	if err != nil {
+		return nil, err
+	}
+
+	var e *Engagement
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&e); err != nil {
+		return nil, fmt.Errorf("error decoding response: %s", err)
+	}
+	return e, nil
+}
+
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, close_engagement bool) (*Engagement, error) {
 	ts := time.Now().String()
 	name := fmt.Sprintf("%s - %s", report_type, ts)
