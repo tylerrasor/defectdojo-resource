@@ -7,7 +7,7 @@ RUN test -z $(gofmt -l ./internal/* ./pkg/*)
 RUN go test ./internal/* ./pkg/* -failfast -cover
 
 RUN mkdir /resource/bin
-# RUN go build -o /resource/bin/check ./cmd/check
+RUN go build -o /resource/bin/check ./cmd/check
 RUN go build -o /resource/bin/in ./cmd/in
 RUN go build -o /resource/bin/out ./cmd/out
 
