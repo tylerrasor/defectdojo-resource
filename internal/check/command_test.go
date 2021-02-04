@@ -31,7 +31,7 @@ func TestCheckErrorsWhenUnexpectedKeysInConcourseRequest(t *testing.T) {
 }
 
 func TestCheckErrorsWhenGetEngagementFails(t *testing.T) {
-	req := `{ "source": {}, "version": {} }`
+	req := `{ "source": {}, "version": { "engagement_id": "5" } }`
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	w := concourse.AttachToWorker(
 		mock_stdin,
@@ -54,6 +54,32 @@ func TestCheckPutsEngagementIdAsVersion(t *testing.T) {
 		io.WriteString(w, e)
 	}))
 
+	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s" }, "version": { "engagement_id": "%s" } }`, mock_server.URL, fmt.Sprint(id))
+	mock_stdin := bytes.NewBuffer([]byte(req))
+	var mock_stdout bytes.Buffer
+	w := concourse.AttachToWorker(
+		mock_stdin,
+		nil,
+		&mock_stdout,
+		nil,
+	)
+
+	err := check.Check(w)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, mock_stdout)
+
+	var r []concourse.Version
+	decoder := json.NewDecoder(&mock_stdout)
+	decoder.Decode(&r)
+	assert.Equal(t, fmt.Sprint(id), r[0].EngagementId)
+}
+
+func TestCheckGivesBunkVersionOnInitialCheckForNow(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Fail(t, "should not be making any network calls until this is actually implemented")
+	}))
+
 	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s" }, "version": {} }`, mock_server.URL)
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	var mock_stdout bytes.Buffer
@@ -69,8 +95,8 @@ func TestCheckPutsEngagementIdAsVersion(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, mock_stdout)
 
-	var r concourse.Response
+	var r []concourse.Version
 	decoder := json.NewDecoder(&mock_stdout)
 	decoder.Decode(&r)
-	assert.Equal(t, fmt.Sprint(id), r.Version.EngagementId)
+	assert.Equal(t, "https://github.com/tylerrasor/defectdojo-resource/issues/29", r[0].EngagementId)
 }
