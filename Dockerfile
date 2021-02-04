@@ -17,4 +17,4 @@ COPY --from=builder /resource/bin /opt/resource
 RUN chmod +x /opt/resource/*
 
 # Test binaries exist
-RUN stat /opt/resource/in /opt/resource/out
+RUN stat /opt/resource/check /opt/resource/in /opt/resource/out
