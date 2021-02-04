@@ -10,7 +10,7 @@ type Response struct {
 }
 
 type Version struct {
-	Version string `json:"version"`
+	EngagementId string `json:"engagement_id"`
 }
 
 type Source struct {

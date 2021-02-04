@@ -58,7 +58,7 @@ func Put(w *concourse.Worker) error {
 
 	r := concourse.Response{
 		Version: concourse.Version{
-			Version: fmt.Sprint(e.EngagementId),
+			EngagementId: fmt.Sprint(e.EngagementId),
 		},
 	}
 	if err := w.OutputResponseToConcourse(r); err != nil {

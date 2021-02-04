@@ -1,4 +1,4 @@
-package in
+package check
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"github.com/tylerrasor/defectdojo-resource/pkg/defectdojo_client"
 )
 
-func Get(w *concourse.Worker) error {
-	request, err := DecodeToGetRequest(w)
+func Check(w *concourse.Worker) error {
+	request, err := DecodeToCheckRequest(w)
 	if err != nil {
 		return fmt.Errorf("invalid payload: %s", err)
 	}
@@ -18,16 +18,16 @@ func Get(w *concourse.Worker) error {
 	}
 
 	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
-	something, err := client.GetSomethingForIn()
+
+	e, err := client.GetEngagement(request.Version.EngagementId)
 	if err != nil {
-		return fmt.Errorf("error getting something: %s", err)
+		return fmt.Errorf("error getting engagement: %s", err)
 	}
-	w.LogDebug(something)
 
 	w.LogDebug("building response object")
 	r := concourse.Response{
 		Version: concourse.Version{
-			EngagementId: "need to figure out unique combination of app name, version, build number, something",
+			EngagementId: fmt.Sprint(e.EngagementId),
 		},
 	}
 	if err := w.OutputResponseToConcourse(r); err != nil {
