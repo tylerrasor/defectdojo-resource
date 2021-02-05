@@ -20,7 +20,7 @@ func Check(w *concourse.Worker) error {
 	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
 
 	issue_url := "https://github.com/tylerrasor/defectdojo-resource/issues/29"
-	w.LogDebug("trying to find engagement_id `%d`", request.Version.EngagementId)
+	w.LogDebug("trying to find engagement_id `%s`", request.Version.EngagementId)
 	var r []concourse.Version
 	if request.Version.EngagementId == "" || request.Version.EngagementId == issue_url {
 		w.LogDebug("need to implement `go get latest engagement of report_type`")
