@@ -34,7 +34,8 @@ func TestGetEngagement(t *testing.T) {
 func TestCreateEngagementSetsTheRequestParamsCorrectly(t *testing.T) {
 	target_date := time.Now()
 	// because we can't match _exactly_ the timestamp
-	target_date_substr := fmt.Sprintf("%d-%02d-%02d %02d:%02d", target_date.Year(), target_date.Month(), target_date.Day(), target_date.Hour(), target_date.Minute())
+	target_date_substr := fmt.Sprintf("%d-%02d-%02d", target_date.Year(), target_date.Month(), target_date.Day())
+	target_date_with_time := fmt.Sprintf("%d-%02d-%02d %02d:%02d", target_date.Year(), target_date.Month(), target_date.Day(), target_date.Hour(), target_date.Minute())
 	app_id := 5
 	report_type := "report"
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -43,10 +44,10 @@ func TestCreateEngagementSetsTheRequestParamsCorrectly(t *testing.T) {
 		decoder := json.NewDecoder(r.Body)
 		decoder.Decode(&e)
 		assert.Equal(t, app_id, e.ProductId)
-		assert.Contains(t, e.StartDate, target_date_substr)
-		assert.Contains(t, e.EndDate, target_date_substr)
+		assert.Equal(t, target_date_substr, e.StartDate)
+		assert.Equal(t, target_date_substr, e.EndDate)
 		assert.Equal(t, "CI/CD", e.EngagementType)
-		name := fmt.Sprintf("%s - %s", report_type, target_date_substr)
+		name := fmt.Sprintf("%s - %s", report_type, target_date_with_time)
 		assert.Contains(t, e.EngagementName, name)
 	}))
 

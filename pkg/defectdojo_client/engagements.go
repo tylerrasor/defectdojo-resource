@@ -37,8 +37,11 @@ func (c *DefectdojoClient) GetEngagement(id string) (*Engagement, error) {
 }
 
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, close_engagement bool) (*Engagement, error) {
-	ts := time.Now().String()
-	name := fmt.Sprintf("%s - %s", report_type, ts)
+	t := time.Now()
+	name := fmt.Sprintf("%s - %s", report_type, t.String())
+	// really? really?? go uses `2006-01-02` as the "reference time" for format strings
+	// https://golang.org/pkg/time/#Time.Format
+	ts := t.Format("2006-01-02")
 	engagement_req := Engagement{
 		ProductId:        p.Id,
 		StartDate:        ts,
