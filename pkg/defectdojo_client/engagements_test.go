@@ -31,32 +31,6 @@ func TestGetEngagement(t *testing.T) {
 	assert.Equal(t, id, e.EngagementId)
 }
 
-func TestCreateEngagementSetsReportName(t *testing.T) {
-	id := 18
-	target_date := "2021-01-01"
-	app_id := 5
-	report_type := "report"
-	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		e := fmt.Sprintf(`{ "id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
-		io.WriteString(w, e)
-	}))
-
-	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
-
-	p := defectdojo_client.Product{
-		Name: "app",
-		Id:   app_id,
-	}
-	e, err := c.CreateEngagement(&p, report_type, false)
-
-	assert.Nil(t, err)
-	assert.NotNil(t, e)
-	assert.Equal(t, e.EngagementId, id)
-	assert.Equal(t, e.ProductId, app_id)
-	assert.Equal(t, e.EngagementName, report_type)
-}
-
 func TestCreateEngagementSetsTheRequestParamsCorrectly(t *testing.T) {
 	target_date := time.Now()
 	// because we can't match _exactly_ the timestamp
