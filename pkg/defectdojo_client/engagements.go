@@ -28,12 +28,7 @@ func (c *DefectdojoClient) GetEngagement(id string) (*Engagement, error) {
 		return nil, err
 	}
 
-	var e *Engagement
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&e); err != nil {
-		return nil, fmt.Errorf("error decoding response: %s", err)
-	}
-	return e, nil
+	return decodeToEngagement(resp)
 }
 
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, close_engagement bool) (*Engagement, error) {
@@ -90,12 +85,7 @@ func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, r
 	}
 	defer resp.Body.Close()
 
-	e, err := decodeToEngagement(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return e, nil
+	return decodeToEngagement(resp)
 }
 
 func decodeToEngagement(resp *http.Response) (*Engagement, error) {
