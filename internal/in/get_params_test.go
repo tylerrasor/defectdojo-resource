@@ -11,7 +11,15 @@ func TestGetParamsValidate(t *testing.T) {
 	params := in.GetParams{}
 
 	err := params.ValidateParams()
-	assert.NotNil(t, err)
 	assert.Error(t, err)
-	assert.Equal(t, err.Error(), "not implemented yet")
+	assert.Equal(t, err.Error(), "Required parameter `report_type` not supplied.")
+}
+
+func TestGetParamsValidateSucceeds(t *testing.T) {
+	params := in.GetParams{
+		ReportType: "something",
+	}
+
+	err := params.ValidateParams()
+	assert.Nil(t, err)
 }
