@@ -31,7 +31,15 @@ func TestCheckErrorsWhenUnexpectedKeysInConcourseRequest(t *testing.T) {
 }
 
 func TestCheckErrorsWhenGetEngagementFails(t *testing.T) {
-	req := `{ "source": {}, "version": { "engagement_id": "5" } }`
+	req := `
+	{
+		"source": {
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name"
+		},
+		"version": { "engagement_id": "5" }
+	}`
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	w := concourse.AttachToWorker(
 		mock_stdin,
@@ -54,7 +62,17 @@ func TestCheckPutsEngagementIdAsVersion(t *testing.T) {
 		io.WriteString(w, e)
 	}))
 
-	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s" }, "version": { "engagement_id": "%s" } }`, mock_server.URL, fmt.Sprint(id))
+	req := fmt.Sprintf(`
+	{
+		"source": {
+			"defectdojo_url": "%s",
+			"api_key": "api_key",
+			"product_name": "product_name"
+		},
+		"version": {
+			"engagement_id": "%s"
+		}
+	}`, mock_server.URL, fmt.Sprint(id))
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	var mock_stdout bytes.Buffer
 	w := concourse.AttachToWorker(
@@ -80,7 +98,15 @@ func TestCheckGivesBunkVersionOnInitialCheckForNow(t *testing.T) {
 		assert.Fail(t, "should not be making any network calls until this is actually implemented")
 	}))
 
-	req := fmt.Sprintf(`{ "source": { "defectdojo_url": "%s" }, "version": {} }`, mock_server.URL)
+	req := fmt.Sprintf(`
+	{
+		"source": {
+			"defectdojo_url": "%s",
+			"api_key": "api_key",
+			"product_name": "product_name"
+		},
+		"version": {}
+	}`, mock_server.URL)
 	mock_stdin := bytes.NewBuffer([]byte(req))
 	var mock_stdout bytes.Buffer
 	w := concourse.AttachToWorker(

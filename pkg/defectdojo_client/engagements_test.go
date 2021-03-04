@@ -31,6 +31,82 @@ func TestGetEngagement(t *testing.T) {
 	assert.Equal(t, id, e.EngagementId)
 }
 
+func TestGetEngagementReturnsErrorOnServerError(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	e, err := c.GetEngagement("id")
+
+	assert.Error(t, err)
+	assert.Nil(t, e)
+}
+
+func TestGetEngagementForReportTypeGetsMostRecent(t *testing.T) {
+	id := 15
+	target_date := time.Now()
+	app_id := 5
+	report_type := "report"
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		// defectdojo stores engagements with autoincrement ids
+		// when returning a list, it sends them back as a list in ascending order
+		// thus, the last entry in the list is the most recent
+		e1 := fmt.Sprintf(`{"id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id-1, target_date, target_date, app_id-1, report_type)
+		e2 := fmt.Sprintf(`{"id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
+		e := fmt.Sprintf(`{"count": 2, "results": [%s, %s]}`, e1, e2)
+		io.WriteString(w, e)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	p := &defectdojo_client.Product{
+		Id: app_id,
+	}
+
+	e, err := c.GetEngagementForReportType(p, report_type)
+
+	assert.Nil(t, err)
+	assert.Equal(t, id, e.EngagementId)
+	assert.Equal(t, app_id, e.ProductId)
+}
+
+func TestGetEngagementForReportTypeJustReturnsErrorOnServerError(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	e, err := c.GetEngagementForReportType(&defectdojo_client.Product{}, "bunk report type")
+
+	assert.Error(t, err)
+	assert.Nil(t, e)
+}
+
+func TestGetEngagementForReportTypeReturnsErrorOnBadPayload(t *testing.T) {
+	app_id := 5
+	report_type := "report"
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, "invalid json")
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	p := &defectdojo_client.Product{
+		Id: app_id,
+	}
+
+	e, err := c.GetEngagementForReportType(p, report_type)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "error decoding response: ")
+	assert.Nil(t, e)
+}
+
 func TestCreateEngagementSetsTheRequestParamsCorrectly(t *testing.T) {
 	target_date := time.Now()
 	// because we can't match _exactly_ the timestamp
@@ -84,7 +160,7 @@ func TestCreateEngagementDoesntCloseWhenCloseEngagementNotSet(t *testing.T) {
 	c.CreateEngagement(&p, report_type, false)
 }
 
-func TestCreateEngagementDoesCloseWhenCloseEngagementNotSet(t *testing.T) {
+func TestCreateEngagementDoesCloseWhenCloseEngagementSet(t *testing.T) {
 	id := 18
 	target_date := "2021-02-04"
 	app_id := 5
@@ -109,6 +185,52 @@ func TestCreateEngagementDoesCloseWhenCloseEngagementNotSet(t *testing.T) {
 	c.CreateEngagement(&p, report_type, true)
 }
 
+func TestCreateEngagementReturnsErrorWhenTheCreatePostServerError(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	p := defectdojo_client.Product{
+		Name: "app",
+		Id:   5,
+	}
+
+	e, err := c.CreateEngagement(&p, "bunk report type", true)
+
+	assert.Error(t, err)
+	assert.Nil(t, e)
+}
+
+func TestCreateEngagementReturnsErrorWhenCloseEngagementPostServerError(t *testing.T) {
+	id := 18
+	target_date := "2021-02-04"
+	app_id := 5
+	report_type := "report"
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v2/engagements/" {
+			w.WriteHeader(http.StatusOK)
+			e := fmt.Sprintf(`{ "id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
+			io.WriteString(w, e)
+		} else {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	p := defectdojo_client.Product{
+		Name: "app",
+		Id:   app_id,
+	}
+
+	e, err := c.CreateEngagement(&p, report_type, true)
+
+	assert.Error(t, err)
+	assert.Nil(t, e)
+}
+
 func TestUploadReport(t *testing.T) {
 	id := 18
 	target_date := "2021-01-01"
@@ -131,4 +253,17 @@ func TestUploadReport(t *testing.T) {
 	assert.Equal(t, e.ProductId, app_id)
 	assert.Equal(t, e.StartDate, target_date)
 	assert.Equal(t, e.EndDate, target_date)
+}
+
+func TestUploadReportReturnsErrorOnServerError(t *testing.T) {
+	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	}))
+
+	c := defectdojo_client.NewDefectdojoClient(mock_server.URL, "api_key")
+
+	e, err := c.UploadReport(1, "bunk report type", []byte{})
+
+	assert.Error(t, err)
+	assert.Nil(t, e)
 }

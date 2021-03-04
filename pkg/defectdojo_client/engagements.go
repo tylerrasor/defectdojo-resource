@@ -10,6 +10,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type EngagementSearchResults struct {
+	Count          int          `json:"count"`
+	EngagementList []Engagement `json:"results"`
+}
+
 type Engagement struct {
 	EngagementId     int    `json:"id,omitempty"`
 	ProductId        int    `json:"product"`
@@ -28,12 +33,31 @@ func (c *DefectdojoClient) GetEngagement(id string) (*Engagement, error) {
 		return nil, err
 	}
 
-	var e *Engagement
+	return decodeToEngagement(resp)
+}
+
+func (c *DefectdojoClient) GetEngagementForReportType(p *Product, report_type string) (*Engagement, error) {
+	params := map[string]string{
+		"eng_type":    "CI/CD",
+		"report_type": report_type,
+		"product":     fmt.Sprint(p.Id),
+	}
+
+	resp, err := c.DoGet("engagements", params)
+	if err != nil {
+		return nil, err
+	}
+
+	var sr *EngagementSearchResults
 	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&e); err != nil {
+	if err := decoder.Decode(&sr); err != nil {
 		return nil, fmt.Errorf("error decoding response: %s", err)
 	}
-	return e, nil
+
+	// defectdojo stores engagements with autoincrement ids
+	// when returning a list, it sends them back as a list in ascending order
+	// thus, the last entry in the list is the most recent
+	return &sr.EngagementList[sr.Count-1], nil
 }
 
 func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, close_engagement bool) (*Engagement, error) {
@@ -69,7 +93,7 @@ func (c *DefectdojoClient) CreateEngagement(p *Product, report_type string, clos
 	if close_engagement {
 		logrus.Debugln("closing engagement because `close_engagement` set")
 		path := fmt.Sprintf("engagements/%d/close", e.EngagementId)
-		if resp, err := c.DoPost(path, &bytes.Buffer{}, APPLICATION_JSON); resp.StatusCode != http.StatusOK || err != nil {
+		if resp, err := c.DoPost(path, &bytes.Buffer{}, APPLICATION_JSON); err != nil || resp.StatusCode != http.StatusOK {
 			return nil, err
 		}
 	}
@@ -90,12 +114,7 @@ func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, r
 	}
 	defer resp.Body.Close()
 
-	e, err := decodeToEngagement(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return e, nil
+	return decodeToEngagement(resp)
 }
 
 func decodeToEngagement(resp *http.Response) (*Engagement, error) {

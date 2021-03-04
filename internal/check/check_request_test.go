@@ -39,7 +39,9 @@ func TestDecodeToCheckRequestWorks(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"defectdojo_url": "something"
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name"
 		},
 		"version": {
 			"engagement_id": "5"
@@ -65,7 +67,9 @@ func TestDecodeToCheckRequestWorksWhenNoVersionGiven(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"defectdojo_url": "something"
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name"
 		}
 	}`))
 
@@ -80,4 +84,28 @@ func TestDecodeToCheckRequestWorksWhenNoVersionGiven(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, check)
+}
+
+func TestDecodeToCheckRequestThrowsErrorWhenSourceValidationFails(t *testing.T) {
+	var mock_stdin bytes.Buffer
+
+	mock_stdin.Write([]byte(`
+	{
+		"source": {
+			"defectdojo_url": ""
+		}
+	}`))
+
+	w := concourse.AttachToWorker(
+		&mock_stdin,
+		os.Stderr,
+		os.Stdout,
+		nil,
+	)
+
+	check, err := check.DecodeToCheckRequest(w)
+
+	assert.Error(t, err)
+	assert.Nil(t, check)
+	assert.Contains(t, err.Error(), "invalid source config: ")
 }

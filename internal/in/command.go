@@ -18,16 +18,22 @@ func Get(w *concourse.Worker) error {
 	}
 
 	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
-	something, err := client.GetSomethingForIn()
+	p, err := client.GetProduct(request.Source.ProductName)
 	if err != nil {
-		return fmt.Errorf("error getting something: %s", err)
+		return fmt.Errorf("error getting product: %s", err)
 	}
-	w.LogDebug(something)
+	w.LogDebug("found product, with id: %d", p.Id)
+
+	e, err := client.GetEngagementForReportType(p, request.Params.ReportType)
+	if err != nil {
+		return fmt.Errorf("error getting engagement: %s", err)
+	}
+	w.LogDebug("found engagement, with id: %d", e.EngagementId)
 
 	w.LogDebug("building response object")
 	r := concourse.Response{
 		Version: concourse.Version{
-			EngagementId: "need to figure out unique combination of app name, version, build number, something",
+			EngagementId: fmt.Sprint(e.EngagementId),
 		},
 	}
 	if err := w.OutputResponseToConcourse(r); err != nil {
