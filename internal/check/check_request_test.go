@@ -39,7 +39,9 @@ func TestDecodeToCheckRequestWorks(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"defectdojo_url": "something"
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name"
 		},
 		"version": {
 			"engagement_id": "5"
@@ -65,7 +67,9 @@ func TestDecodeToCheckRequestWorksWhenNoVersionGiven(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"defectdojo_url": "something"
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name"
 		}
 	}`))
 
