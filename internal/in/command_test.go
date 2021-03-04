@@ -39,9 +39,14 @@ func TestGetTurnsOnDebugWhenParamSet(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
+			"defectdojo_url": "http://something",
+			"api_key": "must exist",
+			"product_name": "also must exist",
 			"debug": true
 		},
-		"params": {}
+		"params": {
+			"report_type": "needs to be here"
+		}
 	}`))
 	var mock_stderr bytes.Buffer
 	w := concourse.AttachToWorker(
@@ -62,9 +67,13 @@ func TestGetThrowsErrorWhenGetProductFails(t *testing.T) {
 	mock_stdin.Write([]byte(`
 	{
 		"source": {
-			"product_name": "product"
+			"defectdojo_url": "http://something",
+			"api_key": "must exist",
+			"product_name": "also must exist"
 		},
-		"params": {}
+		"params": {
+			"report_type": "needs to be here"
+		}
 	}`))
 	w := concourse.AttachToWorker(
 		&mock_stdin,
@@ -97,6 +106,7 @@ func TestGetThrowsErrorWhenGetEngagementForReportTypeFails(t *testing.T) {
 	{
 		"source": {
 			"defectdojo_url": "%s",
+			"api_key": "must exist",
 			"product_name": "%s"
 		},
 		"params": {
@@ -142,6 +152,7 @@ func TestGetProperlySetsVersionOutput(t *testing.T) {
 	{
 		"source": {
 			"defectdojo_url": "%s",
+			"api_key": "must exist",
 			"product_name": "%s"
 		},
 		"params": {

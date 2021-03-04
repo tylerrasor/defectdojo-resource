@@ -12,8 +12,16 @@ type GetRequest struct {
 	Params GetParams        `json:"params"`
 }
 
-func (g GetRequest) Validate() error {
-	return fmt.Errorf("not implemented yet")
+func (r GetRequest) ValidateRequest() error {
+	if err := r.Source.ValidateSource(); err != nil {
+		return fmt.Errorf("invalid source config: %s", err)
+	}
+
+	if err := r.Params.ValidateParams(); err != nil {
+		return fmt.Errorf("invalid params config: %s", err)
+	}
+
+	return nil
 }
 
 func DecodeToGetRequest(w *concourse.Worker) (*GetRequest, error) {
@@ -24,5 +32,10 @@ func DecodeToGetRequest(w *concourse.Worker) (*GetRequest, error) {
 	if err := decoder.Decode(&req); err != nil {
 		return nil, err
 	}
+
+	if err := req.ValidateRequest(); err != nil {
+		return nil, err
+	}
+
 	return &req, nil
 }
