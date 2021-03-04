@@ -1,6 +1,5 @@
 module github.com/tylerrasor/defectdojo-resource
 
-// 1.16rc1
 go 1.16
 
 require (
