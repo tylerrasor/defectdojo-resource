@@ -30,6 +30,32 @@ func TestCheckErrorsWhenUnexpectedKeysInConcourseRequest(t *testing.T) {
 	assert.Contains(t, err.Error(), "invalid payload: ")
 }
 
+func TestCheckTurnsOnDebugWhenParamSet(t *testing.T) {
+	var mock_stdin bytes.Buffer
+	mock_stdin.Write([]byte(`
+	{
+		"source": {
+			"defectdojo_url": "http://something",
+			"api_key": "api_key",
+			"product_name": "product_name",
+			"debug": true
+		},
+		"version": { "engagement_id": "5" }
+	}`))
+	var mock_stderr bytes.Buffer
+	w := concourse.AttachToWorker(
+		&mock_stdin,
+		&mock_stderr,
+		nil,
+		[]string{},
+	)
+
+	check.Check(w)
+	w.LogDebug("what")
+
+	assert.Contains(t, mock_stderr.String(), "debug logging on")
+}
+
 func TestCheckErrorsWhenGetEngagementFails(t *testing.T) {
 	req := `
 	{

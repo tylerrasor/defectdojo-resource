@@ -26,7 +26,7 @@ func (c *DefectdojoClient) BuildJsonRequestBytez(req_payload interface{}) (*byte
 	return bytes.NewBuffer(bytez), nil
 }
 
-func (c *DefectdojoClient) BuildMultipartFormBytez(values map[string]string, bytez []byte) (*bytes.Buffer, string, error) {
+func (c *DefectdojoClient) BuildMultipartFormBytez(values map[string]string, bytez []byte) (*bytes.Buffer, string) {
 	var b bytes.Buffer
 	f := multipart.NewWriter(&b)
 
@@ -40,7 +40,7 @@ func (c *DefectdojoClient) BuildMultipartFormBytez(values map[string]string, byt
 	w.Write(bytez)
 	f.Close()
 
-	return &b, f.FormDataContentType(), nil
+	return &b, f.FormDataContentType()
 }
 
 type PostErrors struct {

@@ -107,7 +107,7 @@ func (c *DefectdojoClient) UploadReport(engagement_id int, report_type string, r
 		"scan_type":  report_type,
 	}
 
-	bytez, header, err := c.BuildMultipartFormBytez(form, report_bytez)
+	bytez, header := c.BuildMultipartFormBytez(form, report_bytez)
 	resp, err := c.DoPost("import-scan", bytez, header)
 	if err != nil {
 		return nil, err
