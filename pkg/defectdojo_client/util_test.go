@@ -58,7 +58,7 @@ func TestBuildMultipartFormBytez(t *testing.T) {
 	data := []byte("test")
 
 	c := defectdojo_client.NewDefectdojoClient("nil", "nil")
-	bytez, header, err := c.BuildMultipartFormBytez(fields, data)
+	bytez, header := c.BuildMultipartFormBytez(fields, data)
 
 	// this isn't awesome, just asserting that those strings are set in the data
 	// but not necessarily in the right order, should be close enough
@@ -66,7 +66,6 @@ func TestBuildMultipartFormBytez(t *testing.T) {
 	expected2 := `Content-Disposition: form-data; name="file";`
 	expected3 := `Content-Type: text/xml`
 
-	assert.Nil(t, err)
 	assert.NotNil(t, bytez)
 	assert.Contains(t, bytez.String(), expected)
 	assert.Contains(t, bytez.String(), expected2)
