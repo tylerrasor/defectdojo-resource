@@ -16,13 +16,14 @@ type EngagementSearchResults struct {
 }
 
 type Engagement struct {
-	EngagementId     int    `json:"id,omitempty"`
-	ProductId        int    `json:"product"`
-	StartDate        string `json:"target_start"`
-	EndDate          string `json:"target_end"`
-	EngagementType   string `json:"engagement_type"`
-	EngagementStatus string `json:"status,omitempty"`
-	EngagementName   string `json:"name"`
+	EngagementId           int    `json:"id,omitempty"`
+	EngagementIdFromUpload int    `json:"engagement,omitempty"`
+	ProductId              int    `json:"product"`
+	StartDate              string `json:"target_start"`
+	EndDate                string `json:"target_end"`
+	EngagementType         string `json:"engagement_type"`
+	EngagementStatus       string `json:"status,omitempty"`
+	EngagementName         string `json:"name"`
 }
 
 func (c *DefectdojoClient) GetEngagement(id string) (*Engagement, error) {

@@ -238,7 +238,7 @@ func TestUploadReport(t *testing.T) {
 	report_type := "report"
 	mock_server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		e := fmt.Sprintf(`{ "id":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
+		e := fmt.Sprintf(`{ "engagement":%d,"target_start":"%s","target_end":"%s","product":%d,"name":"%s"}`, id, target_date, target_date, app_id, report_type)
 		io.WriteString(w, e)
 	}))
 
@@ -248,7 +248,7 @@ func TestUploadReport(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, e)
-	assert.Equal(t, e.EngagementId, id)
+	assert.Equal(t, e.EngagementIdFromUpload, id)
 	assert.Equal(t, e.EngagementName, report_type)
 	assert.Equal(t, e.ProductId, app_id)
 	assert.Equal(t, e.StartDate, target_date)
