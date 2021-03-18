@@ -8,8 +8,8 @@ import (
 )
 
 type GetRequest struct {
-	Source concourse.Source `json:"source"`
-	Params GetParams        `json:"params"`
+	Source  concourse.Source  `json:"source"`
+	Version concourse.Version `json:"version"`
 }
 
 func (r GetRequest) ValidateRequest() error {
@@ -17,8 +17,8 @@ func (r GetRequest) ValidateRequest() error {
 		return fmt.Errorf("invalid source config: %s", err)
 	}
 
-	if err := r.Params.ValidateParams(); err != nil {
-		return fmt.Errorf("invalid params config: %s", err)
+	if r.Version.EngagementId == "" {
+		return fmt.Errorf("version did not have required `engagement_id`")
 	}
 
 	return nil

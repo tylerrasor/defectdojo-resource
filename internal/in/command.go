@@ -18,13 +18,7 @@ func Get(w *concourse.Worker) error {
 	}
 
 	client := defectdojo_client.NewDefectdojoClient(request.Source.DefectDojoUrl, request.Source.ApiKey)
-	p, err := client.GetProduct(request.Source.ProductName)
-	if err != nil {
-		return fmt.Errorf("error getting product: %s", err)
-	}
-	w.LogDebug("found product, with id: %d", p.Id)
-
-	e, err := client.GetEngagementForReportType(p, request.Params.ReportType)
+	e, err := client.GetEngagement(request.Version.EngagementId)
 	if err != nil {
 		return fmt.Errorf("error getting engagement: %s", err)
 	}
