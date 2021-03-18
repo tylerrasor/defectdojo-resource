@@ -280,8 +280,10 @@ func TestPutWhenEverythingGoesRightOutputsVersionToConcourse(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		if r.RequestURI == fmt.Sprintf("/api/v2/products/?name=%s", product_name) {
 			results = fmt.Sprintf(`{ "results": [ { "id": %d, "name": "%s" } ] }`, id, product_name)
-		} else if (r.RequestURI == "/api/v2/engagements/" && r.Method == "POST") || (r.RequestURI == "/api/v2/import-scan/" && r.Method == "POST") {
+		} else if r.RequestURI == "/api/v2/engagements/" && r.Method == "POST" {
 			results = fmt.Sprintf(`{ "id":%d,"target_start":"2021-03-07","target_end":"2021-03-07","product":5,"name":"name"}`, id)
+		} else if r.RequestURI == "/api/v2/import-scan/" && r.Method == "POST" {
+			results = fmt.Sprintf(`{ "engagement":%d,"target_start":"2021-03-07","target_end":"2021-03-07","product":5,"name":"name"}`, id)
 		} else {
 			assert.Fail(t, "shouldn't call any other endpoints", r.RequestURI)
 		}

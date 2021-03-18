@@ -43,7 +43,7 @@ func TestBuildJsonRequestBytez(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotNil(t, bytez)
-	assert.Equal(t, bytez, expected)
+	assert.Equal(t, expected, bytez)
 }
 
 func TestBuildMultipartFormBytez(t *testing.T) {
