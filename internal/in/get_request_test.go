@@ -44,6 +44,9 @@ func TestDecodeToGetRequestWorks(t *testing.T) {
 		},
 		"params": {
 			"report_type": "why did I make so many fields required"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`))
 
@@ -70,6 +73,9 @@ func TestDecodeToGetRequestThrowsErrorWhenSourceValidationFails(t *testing.T) {
 		},
 		"params": {
 			"report_type": "ZAP Scan"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`))
 
@@ -97,7 +103,10 @@ func TestDecodeToPutRequestThrowsErrorWhenParamsValidationFails(t *testing.T) {
 			"api_key": "also exists",
 			"product_name": "provided"
 		},
-		"params": {}
+		"params": {},
+		"version": {
+			"engagement_id": "5"
+		}
 	}`))
 
 	w := concourse.AttachToWorker(
@@ -112,4 +121,33 @@ func TestDecodeToPutRequestThrowsErrorWhenParamsValidationFails(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, get)
 	assert.Contains(t, err.Error(), "invalid params config: ")
+}
+
+func TestDecodeToGetRequestThrowsErrorWhenVersionNotProvided(t *testing.T) {
+	var mock_stdin bytes.Buffer
+
+	mock_stdin.Write([]byte(`
+	{
+		"source": {
+			"defectdojo_url": "http://something",
+			"api_key": "also exists",
+			"product_name": "provided"
+		},
+		"params": {
+			"report_type": "a report"
+		}
+	}`))
+
+	w := concourse.AttachToWorker(
+		&mock_stdin,
+		nil,
+		nil,
+		nil,
+	)
+
+	get, err := in.DecodeToGetRequest(w)
+
+	assert.Error(t, err)
+	assert.Nil(t, get)
+	assert.Contains(t, err.Error(), "version did not have required `engagement_id`")
 }

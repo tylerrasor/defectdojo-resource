@@ -8,8 +8,9 @@ import (
 )
 
 type GetRequest struct {
-	Source concourse.Source `json:"source"`
-	Params GetParams        `json:"params"`
+	Source  concourse.Source  `json:"source"`
+	Params  GetParams         `json:"params"`
+	Version concourse.Version `json:"version"`
 }
 
 func (r GetRequest) ValidateRequest() error {
@@ -35,6 +36,10 @@ func DecodeToGetRequest(w *concourse.Worker) (*GetRequest, error) {
 
 	if err := req.ValidateRequest(); err != nil {
 		return nil, err
+	}
+
+	if req.Version.EngagementId == "" {
+		return nil, fmt.Errorf("version did not have required `engagement_id`")
 	}
 
 	return &req, nil

@@ -46,6 +46,9 @@ func TestGetTurnsOnDebugWhenParamSet(t *testing.T) {
 		},
 		"params": {
 			"report_type": "needs to be here"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`))
 	var mock_stderr bytes.Buffer
@@ -73,6 +76,9 @@ func TestGetThrowsErrorWhenGetProductFails(t *testing.T) {
 		},
 		"params": {
 			"report_type": "needs to be here"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`))
 	w := concourse.AttachToWorker(
@@ -111,6 +117,9 @@ func TestGetThrowsErrorWhenGetEngagementForReportTypeFails(t *testing.T) {
 		},
 		"params": {
 			"report_type": "report type"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`, mock_server.URL, name)
 	mock_stdin.Write([]byte(json))
@@ -157,6 +166,9 @@ func TestGetProperlySetsVersionOutput(t *testing.T) {
 		},
 		"params": {
 			"report_type": "report type"
+		},
+		"version": {
+			"engagement_id": "5"
 		}
 	}`, mock_server.URL, name)
 	mock_stdin.Write([]byte(json))
