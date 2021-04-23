@@ -1,0 +1,216 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Overview",
+  "steps": [
+    {
+      "file": "README.md",
+      "description": "Ok, so this is the basic premise: we want an easy way to configure report aggregation from Concourse CI.  There is a concept of a `resource type`, which allows easy to configure interactions.  That's what we're making here.",
+      "line": 4,
+      "selection": {
+        "start": {
+          "line": 3,
+          "character": 1
+        },
+        "end": {
+          "line": 3,
+          "character": 142
+        }
+      }
+    },
+    {
+      "file": "README.md",
+      "description": "At the heart of things, Concourse utilizes docker containers for all build state.  We can define our own `resource type` by simply referencing the image where that thing is built.",
+      "line": 27,
+      "selection": {
+        "start": {
+          "line": 21,
+          "character": 1
+        },
+        "end": {
+          "line": 26,
+          "character": 16
+        }
+      }
+    },
+    {
+      "file": "Dockerfile",
+      "description": "These are the magic execution time things.  [If you look at the docs](https://concourse-ci.org/implementing-resource-types.html#implementing-resource-types), Concourse will execute whatever \"executable\" thing lives in `/opt/resource/` for each of the \"phases\" of a resource.\n\nThere's a `check`, which is simply \"go look for a new `version`\"; there's an `in`, which is \"retrieve that `version`\"; and there's an `out`, which is \"idempotently create a `version`\".",
+      "line": 20,
+      "selection": {
+        "start": {
+          "line": 20,
+          "character": 1
+        },
+        "end": {
+          "line": 20,
+          "character": 64
+        }
+      }
+    },
+    {
+      "file": "Dockerfile",
+      "description": "In our case, we'll be using binaries compiled from go code.  You can also use a shell script, an executable python script (with the correct shebang), a shell that just invokes a `java -jar` command, or whatever \"executable\" you want.",
+      "line": 12,
+      "selection": {
+        "start": {
+          "line": 9,
+          "character": 1
+        },
+        "end": {
+          "line": 12,
+          "character": 44
+        }
+      }
+    },
+    {
+      "file": "cmd/check/main.go",
+      "description": "This is the \"entrypoint\", for lack of a better term, of the exeuction of a `check` phase for a resource.",
+      "line": 16,
+      "selection": {
+        "start": {
+          "line": 11,
+          "character": 1
+        },
+        "end": {
+          "line": 16,
+          "character": 3
+        }
+      }
+    },
+    {
+      "file": "internal/concourse/worker.go",
+      "description": "It simply \"attaches\" to the execution environment of the container that I'm creating, defined by the `Dockerfile`.  We grab `stdin`, `stdout`, and `stderr`, and well as the array of args passed to the process, and set up a logger.",
+      "line": 24,
+      "selection": {
+        "start": {
+          "line": 16,
+          "character": 1
+        },
+        "end": {
+          "line": 24,
+          "character": 2
+        }
+      }
+    },
+    {
+      "file": "cmd/check/main.go",
+      "description": "I then just shift execution to a non-`main` package, for better testing and logical code splitting.",
+      "line": 18,
+      "selection": {
+        "start": {
+          "line": 18,
+          "character": 1
+        },
+        "end": {
+          "line": 18,
+          "character": 40
+        }
+      }
+    },
+    {
+      "file": "internal/check/command.go",
+      "description": "Cool, so now we're processing a `check` request.  I'm actually going to create code tours that do a deeper dive on what's actually happening, so let's keep this one focused on \"what is a Concourse resource doing?\"",
+      "line": 11
+    },
+    {
+      "file": "internal/check/check_request.go",
+      "description": "So when Concourse decides to invoke an execution phase for a resource, the contract states that it will provide parameters in a specific format.\n\n[For `check`](https://concourse-ci.org/implementing-resource-types.html#resource-check), that means we will receive a `source` and a `version`.",
+      "line": 13,
+      "selection": {
+        "start": {
+          "line": 10,
+          "character": 1
+        },
+        "end": {
+          "line": 13,
+          "character": 2
+        }
+      }
+    },
+    {
+      "file": "internal/check/check_request.go",
+      "description": "And the `source` and `version` are passed as json on `stdin`.  We simply let go struct magic map them correctly, and done.",
+      "line": 24
+    },
+    {
+      "file": "README.md",
+      "description": "The `source` gets defined when you define what specific thing of type `resource type` (in this case, `defectdojo`) you want to interact with.  You can see here that it's a url, some creds, and a specific \"app\".",
+      "line": 34,
+      "selection": {
+        "start": {
+          "line": 29,
+          "character": 1
+        },
+        "end": {
+          "line": 34,
+          "character": 22
+        }
+      }
+    },
+    {
+      "file": "internal/concourse/models.go",
+      "description": "Each `resource type` will have its own things that it needs, but you just need to know that we map them here.  A set of `source` configuration is global to all three phases of a resource, and can have required and optional fields.",
+      "line": 23,
+      "selection": {
+        "start": {
+          "line": 16,
+          "character": 1
+        },
+        "end": {
+          "line": 23,
+          "character": 2
+        }
+      }
+    },
+    {
+      "file": "internal/concourse/models.go",
+      "description": "A `version` is the other thing needed for a `check` phase execution.  It is the unique identifier on the remote thing you're interacting with that all three phases can use to make sure they refer to the same thing.",
+      "line": 14,
+      "selection": {
+        "start": {
+          "line": 12,
+          "character": 1
+        },
+        "end": {
+          "line": 14,
+          "character": 2
+        }
+      }
+    },
+    {
+      "file": "internal/check/command.go",
+      "description": "Then you do your business logic.  I'm not going to go over that in this tour.",
+      "line": 44,
+      "selection": {
+        "start": {
+          "line": 20,
+          "character": 1
+        },
+        "end": {
+          "line": 44,
+          "character": 3
+        }
+      }
+    },
+    {
+      "file": "internal/check/command.go",
+      "description": "And lastly, to satisfy the contract with Concourse for implementing a `resource type`, you have pass back _something_ on `stdout` (in json format).  For a `check` or an `out`, this is simply the agreed upon `version`.  For `in`, you will also create the `resource` to pass back to the execution environment so that a subsequent container can work on it.",
+      "line": 46
+    },
+    {
+      "file": "internal/concourse/worker.go",
+      "description": "And really, that's the end of the lifecycle for an execution of `check`, `in`, or `out`.",
+      "line": 35,
+      "selection": {
+        "start": {
+          "line": 35,
+          "character": 1
+        },
+        "end": {
+          "line": 35,
+          "character": 44
+        }
+      }
+    }
+  ]
+}
