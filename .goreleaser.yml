@@ -32,21 +32,21 @@ builds:
 
 dockers:
 - image_templates:
-  - 'tylerrasor/defectdojo-resource2:{{ .Tag }}-arm64'
+  - 'tylerrasor/defectdojo-resource:{{ .Tag }}-arm64'
   dockerfile: Dockerfile
   use_buildx: true
   build_flag_templates:
   - "--platform=linux/arm64"
   goarch: arm64
 - image_templates:
-  - 'tylerrasor/defectdojo-resource2:{{ .Tag }}-amd64'
+  - 'tylerrasor/defectdojo-resource:{{ .Tag }}-amd64'
   dockerfile: Dockerfile
   use_buildx: true
   build_flag_templates:
   - "--platform=linux/amd64"
   goarch: amd64
 docker_manifests:
-- name_template: tylerrasor/defectdojo-resource2:{{ .Tag }}
+- name_template: tylerrasor/defectdojo-resource:{{ .Tag }}
   image_templates:
-  - tylerrasor/defectdojo-resource2:{{ .Tag }}-arm64
-  - tylerrasor/defectdojo-resource2:{{ .Tag }}-amd64
+  - tylerrasor/defectdojo-resource:{{ .Tag }}-arm64
+  - tylerrasor/defectdojo-resource:{{ .Tag }}-amd64
