@@ -1,0 +1,52 @@
+builds:
+- main: ./cmd/check/main.go
+  id: check
+  binary: check
+  env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  goarch:
+  - arm64
+  - amd64
+- main: ./cmd/in/main.go
+  id: in
+  binary: in
+  env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  goarch:
+  - arm64
+  - amd64
+- main: ./cmd/out/main.go
+  id: out
+  binary: out
+  env:
+  - CGO_ENABLED=0
+  goos:
+  - linux
+  goarch:
+  - arm64
+  - amd64
+
+dockers:
+- image_templates:
+  - 'tylerrasor/defectdojo-resource2:{{ .Tag }}-arm64'
+  dockerfile: Dockerfile
+  use_buildx: true
+  build_flag_templates:
+  - "--platform=linux/arm64"
+  goarch: arm64
+- image_templates:
+  - 'tylerrasor/defectdojo-resource2:{{ .Tag }}-amd64'
+  dockerfile: Dockerfile
+  use_buildx: true
+  build_flag_templates:
+  - "--platform=linux/amd64"
+  goarch: amd64
+docker_manifests:
+- name_template: tylerrasor/defectdojo-resource2:{{ .Tag }}
+  image_templates:
+  - tylerrasor/defectdojo-resource2:{{ .Tag }}-arm64
+  - tylerrasor/defectdojo-resource2:{{ .Tag }}-amd64
