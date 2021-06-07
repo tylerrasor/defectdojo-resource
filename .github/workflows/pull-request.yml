@@ -19,3 +19,11 @@ jobs:
         with:
           go-version: 1.16
       - run: CGO_ENABLED=0 go test ./... -cover
+  conventional-pr:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: Namchee/conventional-pr@v0.4.1
+      with:
+        access_token: ${{ secrets.GITHUB_TOKEN }}
+        allowed_types: 'build,chore,ci,docs,feat,fix,perf,refactor,revert,style,test'
+        link_issue: false
